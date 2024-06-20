@@ -13,6 +13,7 @@ interface CanvasContextType {
   rearrengeObjects: (layers: { id: number; objects: string[]; visible: boolean }[]) => void;
   lockObjects: () => void;
   unlockObjects: () => void;
+  clearCanvas: () => void;
 }
 
 const CanvasContext = createContext<CanvasContextType>({
@@ -30,6 +31,7 @@ const CanvasContext = createContext<CanvasContextType>({
   rearrengeObjects: ([]) => {},
   lockObjects: () => {},
   unlockObjects: () => {},
+  clearCanvas: () => {},
 });
 interface CanvasProviderProps {
   children: ReactNode;
@@ -37,7 +39,6 @@ interface CanvasProviderProps {
 
 const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
-  //const offScreenCanvasRef = useRef<fabric.Canvas | null>(null);
 
   const getObjectById = (id: string) => {
     return canvasRef.current?.getObjects().find((obj) => obj.id === id);
@@ -149,6 +150,11 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     canvasRef?.current?.renderAll();
   };
 
+  const clearCanvas = () => {
+    canvasRef.current?.clear();
+    canvasRef?.current?.renderAll();
+  };
+
   const contextValue: CanvasContextType = {
     canvasRef,
     getObjectById,
@@ -160,6 +166,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     unlockObjects,
     makeObjectsGroup,
     makeObjectsUngroup,
+    clearCanvas,
   };
   return <CanvasContext.Provider value={contextValue}>{children}</CanvasContext.Provider>;
 };

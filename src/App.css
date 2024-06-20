@@ -23,6 +23,7 @@ html {
 }
 .viewParent {
   flex-grow: 1;
+  overflow: scroll;
 }
 
 @media only screen and (max-width: 800px) {

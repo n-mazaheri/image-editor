@@ -18,39 +18,50 @@ export default function ImageSaver() {
   const imagePreview = useSelector(selectImagePreview);
 
   const saveCanvasAsImage = () => {
-    if (canvasRef?.current && imagePreview) {
+    if (canvasRef?.current) {
       const offScreenCanvas = new fabric.Canvas(null, { width: imageWidth, height: imageHeight });
-
-      // Set the original image as the background of the off-screen canvas
-      fabric.Image.fromURL(imagePreview, (img) => {
-        offScreenCanvas.setBackgroundImage(img, offScreenCanvas.renderAll.bind(offScreenCanvas), {
-          top: 0,
-          left: 0,
-          originX: 'left',
-          originY: 'top',
-        });
-        const displayWidth = canvasRef.current?.width;
-        const displayHeight = canvasRef.current?.height;
-        const scaleX = imageWidth / (displayWidth ?? 1);
-        const scaleY = imageHeight / (displayHeight ?? 1);
-
-        // Copy all objects from the main canvas to the off-screen canvas
-        canvasRef.current?.getObjects().forEach((obj) => {
-          const clone = fabric.util.object.clone(obj);
-          clone.set({
-            scaleX: clone.scaleX * scaleX,
-            scaleY: clone.scaleY * scaleY,
-            left: clone.left * scaleX,
-            top: clone.top * scaleY,
+      if (imagePreview) {
+        // Set the original image as the background of the off-screen canvas
+        fabric.Image.fromURL(imagePreview, (img) => {
+          offScreenCanvas.setBackgroundImage(img, offScreenCanvas.renderAll.bind(offScreenCanvas), {
+            top: 0,
+            left: 0,
+            originX: 'left',
+            originY: 'top',
           });
-          offScreenCanvas.add(clone);
+          const displayWidth = canvasRef.current?.width;
+          const displayHeight = canvasRef.current?.height;
+          const scaleX = imageWidth / (displayWidth ?? 1);
+          const scaleY = imageHeight / (displayHeight ?? 1);
+
+          // Copy all objects from the main canvas to the off-screen canvas
+          canvasRef.current?.getObjects().forEach((obj) => {
+            const clone = fabric.util.object.clone(obj);
+            clone.set({
+              scaleX: clone.scaleX * scaleX,
+              scaleY: clone.scaleY * scaleY,
+              left: clone.left * scaleX,
+              top: clone.top * scaleY,
+            });
+            offScreenCanvas.add(clone);
+          });
+
+          // Render the off-screen canvas
+          offScreenCanvas.renderAll();
+
+          // Save the off-screen canvas as an image
+          const dataURL = offScreenCanvas.toDataURL({
+            format: imageType,
+            quality: 1.0,
+          });
+
+          const link = document.createElement('a');
+          link.href = dataURL;
+          link.download = 'canvas-image.' + imageType;
+          link.click();
         });
-
-        // Render the off-screen canvas
-        offScreenCanvas.renderAll();
-
-        // Save the off-screen canvas as an image
-        const dataURL = offScreenCanvas.toDataURL({
+      } else {
+        const dataURL = canvasRef?.current.toDataURL({
           format: imageType,
           quality: 1.0,
         });
@@ -59,7 +70,7 @@ export default function ImageSaver() {
         link.href = dataURL;
         link.download = 'canvas-image.' + imageType;
         link.click();
-      });
+      }
     }
   };
 

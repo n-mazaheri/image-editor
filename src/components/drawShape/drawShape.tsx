@@ -1,17 +1,16 @@
 import { useContext, useState } from 'react';
 import styles from './drawShape.module.css';
-import { useSelector } from 'react-redux';
-import { selectImagePreview } from '../../redux/slices/imageSlice';
 import { CanvasContext } from '../../contexts/canvasContext';
 import useDrawShape, { ShapeType } from '../../hooks/draw';
 import classNames from 'classnames';
+import { useSelector } from 'react-redux';
+import { selectImagePreview } from '../../redux/slices/imageSlice';
 
 const DrawShape = () => {
   const { canvasRef } = useContext(CanvasContext);
   const [shapeType, setShapeType] = useState<ShapeType>(ShapeType.LINE);
-  const imagePreview = useSelector(selectImagePreview);
   const { startDrawing, isDrawing } = useDrawShape(shapeType);
-
+  const imagePreview = useSelector(selectImagePreview);
   return (
     <div>
       <div className={styles.header}>Shapes</div>
@@ -20,21 +19,21 @@ const DrawShape = () => {
           <ShapeButton
             shapeType={ShapeType.LINE}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.LINE}
           />
           <ShapeButton
             shapeType={ShapeType.SQUARE}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.SQUARE}
           />
           <ShapeButton
             shapeType={ShapeType.RECT}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.RECT}
           />
@@ -43,21 +42,21 @@ const DrawShape = () => {
           <ShapeButton
             shapeType={ShapeType.CIRCLE}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.CIRCLE}
           />
           <ShapeButton
             shapeType={ShapeType.ELLIPES}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.ELLIPES}
           />
           <ShapeButton
             shapeType={ShapeType.TEXT}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.TEXT}
           />
@@ -66,21 +65,21 @@ const DrawShape = () => {
           <ShapeButton
             shapeType={ShapeType.POLYGON}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.POLYGON}
           />
           <ShapeButton
             shapeType={ShapeType.POLYLINE}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.POLYLINE}
           />
           <ShapeButton
             shapeType={ShapeType.TRIANGLE}
             setShapeType={setShapeType}
-            disabled={!canvasRef?.current || !imagePreview}
+            disabled={!canvasRef?.current}
             startDrawing={startDrawing}
             selected={isDrawing && shapeType == ShapeType.TRIANGLE}
           />

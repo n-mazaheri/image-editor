@@ -12,9 +12,9 @@ interface CanvasState {
 const initialState: CanvasState = {
   strokeColor: '#ff0000',
   strockeWidth: 2,
-  textColor: '#ff0000',
+  textColor: '#00ff00',
   fontSize: 17,
-  fillColor: '#FFFFFF00',
+  fillColor: '#0000ff',
 };
 
 const canvasSlice = createSlice({

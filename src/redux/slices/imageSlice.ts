@@ -114,7 +114,6 @@ const imageSlice = createSlice({
         layer.grouped = action.payload.grouped;
         layer.objects = layer.objects.filter((object) => !action.payload.removed.find((re) => re == object));
         layer.objects = ([] as string[]).concat(layer.objects, action.payload.added);
-        console.log(layer.objects);
       }
     },
   },

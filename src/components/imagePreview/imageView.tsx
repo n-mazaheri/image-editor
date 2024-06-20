@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { selectImagePreview, setImageHeight, setImageWidth } from '../../redux/slices/imageSlice';
+import { selectImagePreview, setImageHeight, setImagePriview, setImageWidth } from '../../redux/slices/imageSlice';
 import styles from './imageView.module.css';
 import { useContext, useEffect } from 'react';
 import { fabric } from 'fabric';
@@ -9,10 +9,14 @@ export default function ImageView() {
   const imagePreview = useSelector(selectImagePreview);
   const { canvasRef } = useContext(CanvasContext);
   const dispatch = useDispatch();
+
   // Initialize Fabric.js canvas
   useEffect(() => {
     if (canvasRef && !canvasRef.current) {
       canvasRef.current = new fabric.Canvas('canvas');
+      canvasRef.current.setWidth(window.innerWidth * 0.8);
+      canvasRef.current.setHeight(window.innerHeight - 100);
+      dispatch(setImagePriview(''));
     }
   }, []);
 

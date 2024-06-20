@@ -106,9 +106,9 @@ export default function Layers() {
       </div>
       <div className={styles.layersParrent}>
         {layers.map((layer, index) => (
-          <div className={styles.mainRow}>
+          <div className={styles.mainRow} key={'layer' + layer.id}>
             {' '}
-            <div key={'layer' + layer.id} className={styles.layerRow}>
+            <div className={styles.layerRow}>
               <button onClick={() => moveUp(index)}>∧</button>
               <div
                 className={classNames(styles.layersDiv, layer.id == activeLayer ? styles.activeLayer : '')}

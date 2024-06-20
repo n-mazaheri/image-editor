@@ -1,8 +1,9 @@
+import Clear from '../clear/clear';
 import ImageSaver from '../imageSaver/imageSaver';
 import ImageUploader from '../imageUploader/imageUploader';
 import styles from './header.module.css';
 
-export default function Toolbox() {
+export default function Header() {
   return (
     <div className={styles.header}>
       <div className={styles.logoText}>
@@ -12,6 +13,7 @@ export default function Toolbox() {
       <div className={styles.updown}>
         <ImageUploader />
         <ImageSaver />
+        <Clear />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { Provider } from 'react-redux';
 import './App.css';
 import ImageView from './components/imagePreview/imageView';
 import { store } from './redux/store';
-import Toolbox from './components/header/header';
+import Header from './components/header/header';
 import { CanvasProvider } from './contexts/canvasContext';
 
 import SideMenu from './components/sideMenu/sideMenu';
@@ -12,7 +12,7 @@ function App() {
     <div className="App">
       <Provider store={store}>
         <CanvasProvider>
-          <Toolbox />
+          <Header />
           <div className="flex">
             <div className="viewParent">
               <ImageView />

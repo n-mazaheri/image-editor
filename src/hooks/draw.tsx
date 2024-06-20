@@ -195,6 +195,7 @@ const useDrawShape = (shapeType: ShapeType) => {
           const newLine = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
             stroke: strokeColor,
             strokeWidth,
+            fill: fillColor,
             lockRotation: false,
             selectable: true,
             hasControls: true,
