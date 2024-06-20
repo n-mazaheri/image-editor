@@ -7,13 +7,25 @@ import { useSelector } from 'react-redux';
 import { selectImagePreview } from '../../redux/slices/imageSlice';
 
 const DrawShape = () => {
-  const { canvasRef } = useContext(CanvasContext);
+  const { canvasRef, selectedShapes, removeSelectedObjects } = useContext(CanvasContext);
   const [shapeType, setShapeType] = useState<ShapeType>(ShapeType.LINE);
   const { startDrawing, isDrawing } = useDrawShape(shapeType);
   const imagePreview = useSelector(selectImagePreview);
   return (
     <div>
-      <div className={styles.header}>Shapes</div>
+      <div className={styles.header}>
+        {selectedShapes?.length && (
+          <button
+            onClick={() => {
+              removeSelectedObjects();
+            }}
+            className={styles.deleteButton}
+          >
+            Delete
+          </button>
+        )}
+        Shapes
+      </div>
       <div>
         <div className={styles.shapeRow}>
           <ShapeButton

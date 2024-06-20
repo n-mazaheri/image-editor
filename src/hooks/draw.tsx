@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { fabric } from 'fabric';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,14 +38,15 @@ declare module 'fabric' {
 }
 
 const useDrawShape = (shapeType: ShapeType) => {
-  const { canvasRef, lockObjects, unlockObjects } = useContext(CanvasContext);
+  const { canvasRef, lockObjects, unlockObjects, selectedShapes, setSelectedShapes, removeSelectedObjects } =
+    useContext(CanvasContext);
   const dispatch = useDispatch();
   const [isDrawing, setIsDrawing] = useState(false);
   const [shape, setShape] = useState<fabric.Object | null>(null);
   const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([]);
   const [line, setLine] = useState<fabric.Polyline | null>(null);
+  const [lines, setLines] = useState([]);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-  const [selectedShapes, setSelectedShapes] = useState<fabric.Object[] | null>(null);
   const strokeColor = useSelector(selectStrokeColor);
   const strokeWidth = useSelector(selectStrokewidth);
   const fillColor = useSelector(selectFillColor);
@@ -67,28 +68,28 @@ const useDrawShape = (shapeType: ShapeType) => {
     }
   }, [shape, dispatch]);
 
-  useEffect(() => {
-    const addPoint = (opt: fabric.IEvent<MouseEvent>) => {
-      const pointer = canvasRef?.current?.getPointer(opt.e);
-      const points = [...polygonPoints, { x: pointer?.x ?? 0, y: pointer?.y ?? 0 }];
-      setPolygonPoints(points);
+  const addPoint = (opt: fabric.IEvent<MouseEvent>) => {
+    const pointer = canvasRef?.current?.getPointer(opt.e);
+    const points = [...polygonPoints, { x: pointer?.x ?? 0, y: pointer?.y ?? 0 }];
+    setPolygonPoints(points);
 
-      if (points.length > 1) {
-        if (line) {
-          canvasRef?.current?.remove(line);
-        }
-        const polyLine = new fabric.Polyline(points, {
-          fill: 'rgba(0,0,0,0)',
-          stroke: 'black',
-          strokeWidth: 2,
-          selectable: false,
-          evented: false,
-        });
-        canvasRef?.current?.add(polyLine);
-        setLine(polyLine);
+    if (points.length > 1) {
+      if (line) {
+        canvasRef?.current?.remove(line);
       }
-    };
+      const polyLine = new fabric.Polyline(points, {
+        fill: 'rgba(0,0,0,0)',
+        stroke: 'black',
+        strokeWidth: 2,
+        selectable: true,
+        evented: false,
+      });
+      canvasRef?.current?.add(polyLine);
+      setLine(polyLine);
+    }
+  };
 
+  useEffect(() => {
     const handleMouseDown = (event: fabric.IEvent<MouseEvent>) => {
       if (isDrawing && canvasRef?.current) {
         const id = uuidv4();
@@ -170,6 +171,8 @@ const useDrawShape = (shapeType: ShapeType) => {
               strokeWidth: 2,
               selectable: false,
               evented: false,
+              width: 100,
+              height: 100,
             });
             canvasRef.current.add(newLine);
             setLine(newLine);
@@ -371,8 +374,8 @@ const useDrawShape = (shapeType: ShapeType) => {
       selectedShapes.map((shape) => {
         if (shape.type !== 'textbox') {
           shape.set('stroke', strokeColor);
-          shape.set('fill', fillColor);
           shape.set('strokeWidth', strokeWidth);
+          if (shape.type != 'line') shape.set('fill', fillColor);
         } else {
           shape.set('fill', textColor);
           (shape as fabric.Textbox).set('fontSize', fontSize);
@@ -385,14 +388,7 @@ const useDrawShape = (shapeType: ShapeType) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Delete' || event.key === 'Backspace') {
-        if (selectedShapes && canvasRef?.current) {
-          selectedShapes.forEach((shape) => {
-            canvasRef.current?.remove(shape);
-          });
-          setSelectedShapes(null);
-          canvasRef.current.discardActiveObject();
-          canvasRef.current.renderAll();
-        }
+        removeSelectedObjects();
       }
     };
 

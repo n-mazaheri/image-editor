@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useRef } from 'react';
+import React, { ReactNode, createContext, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -6,6 +6,7 @@ interface CanvasContextType {
   canvasRef: React.MutableRefObject<fabric.Canvas | null> | null;
   getObjectById: (id: string) => fabric.Object | undefined;
   removeObjects: (ids: string[]) => void;
+  removeSelectedObjects: () => void;
   makeObjectsInvisible: (ids: string[]) => void;
   makeObjectsVisible: (ids: string[]) => void;
   makeObjectsGroup: (ids: string[]) => string;
@@ -14,12 +15,15 @@ interface CanvasContextType {
   lockObjects: () => void;
   unlockObjects: () => void;
   clearCanvas: () => void;
+  selectedShapes: fabric.Object[] | null;
+  setSelectedShapes: React.Dispatch<React.SetStateAction<fabric.Object[] | null>>;
 }
 
 const CanvasContext = createContext<CanvasContextType>({
   canvasRef: null,
   getObjectById: () => undefined,
   removeObjects: ([]) => {},
+  removeSelectedObjects: () => {},
   makeObjectsInvisible: ([]) => {},
   makeObjectsVisible: ([]) => {},
   makeObjectsGroup: ([]) => {
@@ -32,6 +36,8 @@ const CanvasContext = createContext<CanvasContextType>({
   lockObjects: () => {},
   unlockObjects: () => {},
   clearCanvas: () => {},
+  selectedShapes: [],
+  setSelectedShapes: () => {},
 });
 interface CanvasProviderProps {
   children: ReactNode;
@@ -39,7 +45,7 @@ interface CanvasProviderProps {
 
 const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
-
+  const [selectedShapes, setSelectedShapes] = useState<fabric.Object[] | null>(null);
   const getObjectById = (id: string) => {
     return canvasRef.current?.getObjects().find((obj) => obj.id === id);
   };
@@ -51,6 +57,17 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
         canvasRef.current?.remove(object);
       }
     });
+  };
+
+  const removeSelectedObjects = () => {
+    if (selectedShapes && canvasRef?.current) {
+      selectedShapes.forEach((shape) => {
+        canvasRef.current?.remove(shape);
+      });
+      setSelectedShapes(null);
+      canvasRef.current.discardActiveObject();
+      canvasRef.current.renderAll();
+    }
   };
 
   const rearrengeObjects = (layers: { id: number; objects: string[]; visible: boolean }[]) => {
@@ -167,6 +184,9 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     makeObjectsGroup,
     makeObjectsUngroup,
     clearCanvas,
+    selectedShapes,
+    setSelectedShapes,
+    removeSelectedObjects,
   };
   return <CanvasContext.Provider value={contextValue}>{children}</CanvasContext.Provider>;
 };
