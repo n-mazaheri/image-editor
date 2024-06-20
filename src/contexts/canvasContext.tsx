@@ -17,6 +17,7 @@ interface CanvasContextType {
   clearCanvas: () => void;
   selectedShapes: fabric.Object[] | null;
   setSelectedShapes: React.Dispatch<React.SetStateAction<fabric.Object[] | null>>;
+  getCanvasAtResoution: (newWidth: number, newHeight: number) => void;
 }
 
 const CanvasContext = createContext<CanvasContextType>({
@@ -38,6 +39,7 @@ const CanvasContext = createContext<CanvasContextType>({
   clearCanvas: () => {},
   selectedShapes: [],
   setSelectedShapes: () => {},
+  getCanvasAtResoution: () => {},
 });
 interface CanvasProviderProps {
   children: ReactNode;
@@ -172,6 +174,34 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     canvasRef?.current?.renderAll();
   };
 
+  const getCanvasAtResoution = (newWidth: number, newHeight: number) => {
+    if (canvasRef?.current) {
+      let canvas = canvasRef.current;
+      if (canvas.width != newWidth) {
+        var scaleMultiplier = newWidth / (canvas.width ?? 1);
+        var objects = canvas.getObjects();
+        for (var i in objects) {
+          objects[i].scaleX = (objects[i].scaleX ?? 1) * scaleMultiplier;
+          objects[i].scaleY = (objects[i].scaleY ?? 1) * scaleMultiplier;
+          objects[i].left = (objects[i].left ?? 1) * scaleMultiplier;
+          objects[i].top = (objects[i].top ?? 1) * scaleMultiplier;
+          objects[i].setCoords();
+        }
+        var obj = canvas.backgroundImage;
+        if (obj) {
+          (obj as fabric.Image).scaleX = ((obj as fabric.Image)?.scaleX ?? 1) * scaleMultiplier;
+          (obj as fabric.Image).scaleY = ((obj as fabric.Image)?.scaleY ?? 1) * scaleMultiplier;
+        }
+
+        canvas.discardActiveObject();
+        canvas.setWidth(newWidth);
+        canvas.setHeight(newHeight);
+        canvas.renderAll();
+        canvas.calcOffset();
+      }
+    }
+  };
+
   const contextValue: CanvasContextType = {
     canvasRef,
     getObjectById,
@@ -187,6 +217,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     selectedShapes,
     setSelectedShapes,
     removeSelectedObjects,
+    getCanvasAtResoution,
   };
   return <CanvasContext.Provider value={contextValue}>{children}</CanvasContext.Provider>;
 };
