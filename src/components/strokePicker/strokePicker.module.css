@@ -1,0 +1,11 @@
+.selectProp {
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  width: 3rem;
+}
+
+@media only screen and (max-width: 800px) {
+  .selectProp {
+    width: 4rem;
+  }
+}

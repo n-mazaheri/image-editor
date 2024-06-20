@@ -1,0 +1,44 @@
+.header {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.settingRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+.settingRow2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.settingColumn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.blank {
+  width: 5.5rem;
+}
+
+.icon {
+  width: 2rem;
+}
+
+@media only screen and (max-width: 800px) {
+  .header {
+    margin-top: 0rem;
+  }
+}

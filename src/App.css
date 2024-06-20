@@ -1,0 +1,40 @@
+html {
+  font-size: 14px;
+  text-align: center;
+}
+
+.toolboxButton {
+  padding: 0.625rem 1.25rem; /* 10px / 16px = 0.625rem, 20px / 16px = 1.25rem */
+  margin: 0 0.625rem; /* 10px / 16px = 0.625rem */
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: none;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-size: 1rem; /* 16px / 16px = 1rem */
+}
+
+.upDownButton {
+  width: 8.7rem;
+}
+.flex {
+  display: flex;
+}
+.viewParent {
+  flex-grow: 1;
+}
+
+@media only screen and (max-width: 800px) {
+  html {
+    font-size: 12px;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .remove {
+    display: none;
+  }
+  .upDownButton {
+    width: 6.7rem;
+  }
+}

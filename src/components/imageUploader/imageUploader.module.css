@@ -1,0 +1,16 @@
+input[type='file'] {
+  display: none;
+}
+
+.upload-button {
+  padding: 0.625rem 1.25rem; /* 10px / 16px = 0.625rem, 20px / 16px = 1.25rem */
+  margin: 0 0.625rem; /* 10px / 16px = 0.625rem */
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: none;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-size: 1rem; /* 16px / 16px = 1rem */
+  margin-top: 5rem;
+}

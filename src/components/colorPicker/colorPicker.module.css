@@ -1,0 +1,9 @@
+.colorPicker {
+  cursor: pointer;
+  padding: 0.1rem;
+  border: none;
+  border-radius: 0.2rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 3rem;
+  height: 2.3rem;
+}
