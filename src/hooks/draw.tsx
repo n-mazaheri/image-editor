@@ -44,8 +44,7 @@ const useDrawShape = (shapeType: ShapeType) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [shape, setShape] = useState<fabric.Object | null>(null);
   const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([]);
-  const [line, setLine] = useState<fabric.Polyline | null>(null);
-  const [lines, setLines] = useState([]);
+  const [lines, setLines] = useState<fabric.Line[]>([]);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const strokeColor = useSelector(selectStrokeColor);
   const strokeWidth = useSelector(selectStrokewidth);
@@ -70,23 +69,20 @@ const useDrawShape = (shapeType: ShapeType) => {
 
   const addPoint = (opt: fabric.IEvent<MouseEvent>) => {
     const pointer = canvasRef?.current?.getPointer(opt.e);
-    const points = [...polygonPoints, { x: pointer?.x ?? 0, y: pointer?.y ?? 0 }];
+    let newPoint = { x: pointer?.x ?? 0, y: pointer?.y ?? 0 };
+    const points = [...polygonPoints, newPoint];
     setPolygonPoints(points);
-
-    if (points.length > 1) {
-      if (line) {
-        canvasRef?.current?.remove(line);
-      }
-      const polyLine = new fabric.Polyline(points, {
-        fill: 'rgba(0,0,0,0)',
-        stroke: 'black',
-        strokeWidth: 2,
-        selectable: true,
-        evented: false,
-      });
-      canvasRef?.current?.add(polyLine);
-      setLine(polyLine);
-    }
+    const newLine = new fabric.Line([newPoint.x, newPoint.y, newPoint.x, newPoint.y], {
+      stroke: strokeColor,
+      strokeWidth,
+      fill: fillColor,
+      lockRotation: false,
+      selectable: true,
+      hasControls: true,
+    });
+    canvasRef?.current?.add(newLine);
+    setLines([...lines, newLine]);
+    canvasRef?.current?.renderAll();
   };
 
   useEffect(() => {
@@ -163,22 +159,7 @@ const useDrawShape = (shapeType: ShapeType) => {
           canvasRef.current.add(newRectangle);
           setShape(newRectangle);
         } else if (shapeType === ShapeType.POLYGON || shapeType === ShapeType.POLYLINE) {
-          if (polygonPoints.length === 0) {
-            setPolygonPoints([{ x: pointer.x, y: pointer.y }]);
-            const newLine = new fabric.Polyline([new fabric.Point(pointer.x, pointer.y)], {
-              fill: 'rgba(0,0,0,0)',
-              stroke: 'black',
-              strokeWidth: 2,
-              selectable: false,
-              evented: false,
-              width: 100,
-              height: 100,
-            });
-            canvasRef.current.add(newLine);
-            setLine(newLine);
-          } else {
-            addPoint(event);
-          }
+          addPoint(event);
         } else if (shapeType === ShapeType.CIRCLE) {
           const newCircle = new fabric.Circle({
             left: pointer.x,
@@ -226,7 +207,7 @@ const useDrawShape = (shapeType: ShapeType) => {
     };
 
     const handleMouseMove = (event: fabric.IEvent<MouseEvent>) => {
-      if (isDrawing && canvasRef?.current && (shape || line)) {
+      if (isDrawing && canvasRef?.current && (shape || polygonPoints.length > 0)) {
         const pointer = canvasRef.current.getPointer(event.e);
         if (shapeType === ShapeType.ELLIPES) {
           const rx = Math.abs(pointer.x - (shape!.left ?? 0));
@@ -258,10 +239,7 @@ const useDrawShape = (shapeType: ShapeType) => {
           const radius = Math.hypot(pointer.x - (shape!.left ?? 0), pointer.y - (shape!.top ?? 0));
           (shape as fabric.Circle).set({ radius: radius });
         } else if (shapeType === ShapeType.POLYGON || shapeType === ShapeType.POLYLINE) {
-          const points = [...polygonPoints, { x: pointer.x, y: pointer.y }].map((p) => new fabric.Point(p.x, p.y));
-          if (line) {
-            line.set({ points });
-          }
+          lines[lines.length - 1].set({ x2: pointer.x, y2: pointer.y });
         }
         canvasRef.current.renderAll();
       }
@@ -283,7 +261,7 @@ const useDrawShape = (shapeType: ShapeType) => {
                   id,
                 })
               : new fabric.Polyline(polygonPoints, {
-                  fill: fillColor,
+                  fill: '#00000000',
                   stroke: strokeColor,
                   strokeWidth: strokeWidth,
                   selectable: true,
@@ -298,10 +276,11 @@ const useDrawShape = (shapeType: ShapeType) => {
           setIsDrawing(false);
           unlockObjects();
           setShape(null);
-          if (line) {
+          for (let line of lines) {
             canvasRef?.current?.remove(line);
-            setLine(null);
           }
+          setLines([]);
+
           if (canvasRef?.current) {
             canvasRef.current.defaultCursor = 'default';
           }
@@ -355,19 +334,7 @@ const useDrawShape = (shapeType: ShapeType) => {
       canvasRef?.current?.off('selection:cleared', handleSelectionCleared as (e: fabric.IEvent) => void);
       canvasRef?.current?.off('mouse:dblclick', handleDoubleClick);
     };
-  }, [
-    isDrawing,
-    shape,
-    strokeColor,
-    strokeWidth,
-    canvasRef,
-    fontSize,
-    fillColor,
-    textColor,
-    polygonPoints,
-    line,
-    shapeType,
-  ]);
+  }, [isDrawing, shape, strokeColor, strokeWidth, canvasRef, fontSize, fillColor, textColor, polygonPoints, shapeType]);
 
   useEffect(() => {
     if (selectedShapes && canvasRef?.current) {
