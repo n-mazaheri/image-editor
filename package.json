@@ -16,9 +16,11 @@
     "fabric": "^5.3.0",
     "fabricjs-react": "^1.2.2",
     "react": "^18.3.1",
+    "react-color": "^2.19.3",
     "react-dom": "^18.3.1",
     "react-redux": "^9.1.2",
     "react-scripts": "5.0.1",
+    "rgb-hex": "^4.1.0",
     "typescript": "^4.9.5",
     "uuid": "^10.0.0",
     "web-vitals": "^2.1.4"
@@ -49,6 +51,7 @@
   },
   "devDependencies": {
     "@types/fabric": "^5.3.7",
+    "@types/react-color": "^3.0.12",
     "@types/uuid": "^9.0.8"
   }
 }

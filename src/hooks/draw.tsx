@@ -401,7 +401,7 @@ const useDrawShape = (shapeType: ShapeType) => {
     };
   }, [selectedShapes, canvasRef]);
 
-  return { startDrawing };
+  return { startDrawing, isDrawing };
 };
 
 export default useDrawShape;

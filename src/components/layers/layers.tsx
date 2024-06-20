@@ -106,30 +106,40 @@ export default function Layers() {
       </div>
       <div className={styles.layersParrent}>
         {layers.map((layer, index) => (
-          <div key={'layer' + layer.id} className={styles.layerRow}>
-            <button onClick={() => moveUp(index)}>∧</button>
-            <div
-              className={classNames(styles.layersDiv, layer.id == activeLayer ? styles.activeLayer : '')}
-              onClick={() => setActiveLayerLocal(layer.id)}
-            >
-              {layer.id}
+          <div className={styles.mainRow}>
+            {' '}
+            <div key={'layer' + layer.id} className={styles.layerRow}>
+              <button onClick={() => moveUp(index)}>∧</button>
+              <div
+                className={classNames(styles.layersDiv, layer.id == activeLayer ? styles.activeLayer : '')}
+                onClick={() => setActiveLayerLocal(layer.id)}
+              >
+                {layer.id}
+              </div>
+              <button onClick={() => moveDown(index)}>∨</button>
+              <button onClick={() => removeLayerLocal(layer.id)}>-</button>
             </div>
-            <button onClick={() => moveDown(index)}>∨</button>
-            <button onClick={() => removeLayerLocal(layer.id)}>-</button>
-            <input
-              type="checkbox"
-              checked={layer.visible}
-              onChange={() => {
-                handleLayerVisibility(layer.id, !layer.visible, layer.objects);
-              }}
-            ></input>
-            <input
-              type="checkbox"
-              checked={layer.grouped}
-              onChange={() => {
-                handleLayerGroup(layer.id, !layer.grouped, layer.objects);
-              }}
-            ></input>
+            <div className={styles.layerRow2}>
+              {' '}
+              <input
+                type="checkbox"
+                checked={layer.visible}
+                onChange={() => {
+                  handleLayerVisibility(layer.id, !layer.visible, layer.objects);
+                }}
+                id="VisibleCheck"
+              ></input>
+              <label htmlFor="VisibleCheck">Visible</label>
+              <input
+                type="checkbox"
+                checked={layer.grouped}
+                onChange={() => {
+                  handleLayerGroup(layer.id, !layer.grouped, layer.objects);
+                }}
+                id="GroupedCheck"
+              ></input>{' '}
+              <label htmlFor="GroupedCheck">Group</label>
+            </div>
           </div>
         ))}
       </div>

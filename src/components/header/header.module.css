@@ -15,17 +15,17 @@
   display: flex;
   gap: 1.5rem;
   color: white;
-  margin-top: 2rem;
+  margin-top: 1rem;
   justify-content: center;
   align-items: center;
 }
 .name {
   font-weight: 700;
-  font-size: 30px;
+  font-size: 2rem;
   color: white;
 }
 .image {
-  width: 6rem;
+  width: 4rem;
 }
 
 .logoText {

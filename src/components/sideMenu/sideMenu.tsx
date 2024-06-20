@@ -29,8 +29,10 @@ export default function SideMenu() {
       </div>
       {visible && (
         <>
-          <Settings />
           <DrawShape />
+          <hr className={styles.hr} />
+          <Settings />
+          <hr className={styles.hr} />
           <Layers />
         </>
       )}

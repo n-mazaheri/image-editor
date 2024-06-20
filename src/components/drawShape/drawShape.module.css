@@ -8,9 +8,12 @@
   border-radius: 0.25rem; /* 4px / 16px = 0.25rem */
   cursor: pointer;
 }
+.selected {
+  background-color: #d4d4d4;
+}
 
 .header {
-  margin-top: 2rem;
+  margin-top: 1rem;
   display: flex;
   gap: 1rem;
   justify-content: center;

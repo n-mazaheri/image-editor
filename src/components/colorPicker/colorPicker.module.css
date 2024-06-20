@@ -1,9 +1,31 @@
-.colorPicker {
-  cursor: pointer;
-  padding: 0.1rem;
-  border: none;
-  border-radius: 0.2rem;
-  background-color: rgba(255, 255, 255, 0.8);
-  width: 3rem;
-  height: 2.3rem;
+.color-picker-component {
+  position: relative;
+  display: inline-block;
+}
+
+.popover {
+  position: absolute;
+  z-index: 2;
+  top: 100%; /* Adjust the position as needed */
+  left: -180px;
+}
+
+.cover {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.picker {
+  position: absolute;
+  z-index: 1000;
+}
+
+.button {
+  width: 2.5rem;
+  height: 1.5rem;
+  padding: 0.2rem;
+  border-style: solid;
+  border-color: gainsboro;
 }

@@ -1,5 +1,5 @@
 .header {
-  margin-top: 2rem;
+  margin-top: 0.5rem;
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -31,4 +31,10 @@
 .layerRow {
   display: flex;
   gap: 0.2rem;
+}
+.mainRow {
+  margin-bottom: 1rem;
+}
+.layerRow2 {
+  font-size: 0.8rem;
 }

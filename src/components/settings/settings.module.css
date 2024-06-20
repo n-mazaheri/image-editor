@@ -1,5 +1,5 @@
 .header {
-  margin-top: 2rem;
+  margin-top: 0.5rem;
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -30,7 +30,7 @@
 }
 
 .blank {
-  width: 5.5rem;
+  width: 5rem;
 }
 
 .icon {
