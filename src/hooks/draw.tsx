@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, useRef } from 'react';
 import { fabric } from 'fabric';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch, useSelector } from 'react-redux';
-import { addObject } from '../redux/slices/imageSlice';
+import { addObject, setRequestUngroupActiveGroup } from '../redux/slices/imageSlice';
 import { CanvasContext } from '../contexts/canvasContext';
 import {
   selectFontSize,
@@ -53,6 +53,7 @@ const useDrawShape = (shapeType: ShapeType) => {
   const textColor = useSelector(selectTextColor);
 
   const startDrawing = () => {
+    dispatch(setRequestUngroupActiveGroup(true));
     setIsDrawing(true);
     if (canvasRef?.current) {
       canvasRef.current.defaultCursor = 'crosshair'; // Set cursor to crosshair
@@ -289,6 +290,7 @@ const useDrawShape = (shapeType: ShapeType) => {
           canvasRef?.current?.add(polygon);
           dispatch(addObject(id));
           setPolygonPoints([]);
+          dispatch(setRequestUngroupActiveGroup(false));
           setIsDrawing(false);
           unlockObjects();
           setShape(null);
@@ -305,6 +307,7 @@ const useDrawShape = (shapeType: ShapeType) => {
 
     const handleMouseUp = () => {
       if (shapeType !== ShapeType.POLYGON && shapeType !== ShapeType.POLYLINE) {
+        dispatch(setRequestUngroupActiveGroup(false));
         setIsDrawing(false);
         unlockObjects();
         setShape(null);

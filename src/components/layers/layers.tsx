@@ -10,6 +10,7 @@ import {
   moveLayerDown,
   moveLayerUp,
   changeLayerGroup,
+  selectRequestUngroupActiveGroup,
 } from '../../redux/slices/imageSlice';
 import classNames from 'classnames';
 import { useContext, useEffect } from 'react';
@@ -17,6 +18,7 @@ import { CanvasContext } from '../../contexts/canvasContext';
 export default function Layers() {
   const layers = useSelector(selectLayers);
   const activeLayer = useSelector(selectActiveLayer);
+  const ungroupActiveGroup = useSelector(selectRequestUngroupActiveGroup);
   const {
     canvasRef,
     removeObjects,
@@ -30,6 +32,15 @@ export default function Layers() {
   useEffect(() => {
     rearrengeObjects(layers);
   }, [layers]);
+
+  useEffect(() => {
+    if (ungroupActiveGroup == true && activeLayer) {
+      let activeLayerInfo = layers.find((la) => la.id == activeLayer);
+      if (activeLayerInfo && activeLayerInfo.grouped == true) {
+        handleLayerGroup(activeLayer, false, layers.find((la) => la.id == activeLayer)?.objects ?? []);
+      }
+    }
+  }, [ungroupActiveGroup]);
 
   const dispatch = useDispatch();
   const addLayerLocal = () => {
