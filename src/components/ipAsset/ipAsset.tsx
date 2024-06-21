@@ -64,21 +64,23 @@ function ProcessModal(props: { setOpenModal: React.Dispatch<React.SetStateAction
   useEffect(() => {
     setFirstStep(State.LOADING);
     uploadImage()
-      .then((link: string) => {
+      .then((res: { link: string; uri: string }) => {
         setFirstStep(State.SUCCESS);
         setSecondStep(State.LOADING);
-        setLink(link);
-        mintNFT()
-          .then((res) => {
-            console.log(res);
-            setTokenId(res);
+        setLink(res.link);
+        mintNFT(res.uri)
+          .then((res2) => {
+            console.log(res2);
+            setTokenId(res2);
             setSecondStep(State.SUCCESS);
             setThirdStep(State.LOADING);
-            registerIPAsset(res)
+            registerIPAsset(res2, res.uri)
               .then(() => {
+                console.log('ok');
                 setThirdStep(State.SUCCESS);
               })
-              .catch(() => {
+              .catch((e) => {
+                console.log(e);
                 setThirdStep(State.ERROR);
               });
           })

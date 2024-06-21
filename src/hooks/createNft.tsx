@@ -2,7 +2,7 @@ import { StoryClient, StoryConfig } from '@story-protocol/core-sdk';
 import { Address, createThirdwebClient, getContract, prepareContractCall, simulateTransaction } from 'thirdweb';
 import { useActiveAccount, useActiveWalletChain } from 'thirdweb/react';
 import { viemAdapter } from 'thirdweb/adapters/viem';
-import { http } from 'viem';
+import { custom, toHex } from 'viem';
 import { useSelector } from 'react-redux';
 import { selectImageHeight, selectImagePreview, selectImageType, selectImageWidth } from '../redux/slices/imageSlice';
 import { upload } from 'thirdweb/storage';
@@ -22,29 +22,48 @@ const useCreateNft = () => {
 
   const mintContractAbi = [
     {
-      inputs: [{ internalType: 'address', name: 'to', type: 'address' }],
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'to',
+          type: 'address',
+        },
+        {
+          internalType: 'string',
+          name: 'customUri',
+          type: 'string',
+        },
+      ],
       name: 'mint',
-      outputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'tokenId',
+          type: 'uint256',
+        },
+      ],
       stateMutability: 'nonpayable',
       type: 'function',
     },
   ] as any;
-  async function mintNFT() {
+  async function mintNFT(uri: string) {
     if (chain) {
       const myContract = getContract({
         client,
         chain,
-        address: '0x7ee32b8b515dee0ba2f25f612a04a731eec24f49',
+        address: '0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc',
         abi: mintContractAbi,
       });
       const transaction = prepareContractCall({
         contract: myContract,
         method: 'mint',
-        params: [userAddress],
+        params: [userAddress, uri],
       });
 
       const tokenId = await simulateTransaction({ transaction });
       console.log(tokenId);
+      console.log('fdfdsf');
+
       return tokenId;
     }
   }
@@ -93,18 +112,22 @@ const useCreateNft = () => {
     let blob = dataURItoBlob(dataURL);
     const uris = await upload({ client, files: [new File([blob], 'image.' + imageType)] });
     console.log(ipfsToHttp(uris));
-    return ipfsToHttp(uris);
+    return { link: ipfsToHttp(uris), uri: uris };
   }
 
-  async function registerIPAsset(tokenId: string) {
+  async function registerIPAsset(tokenId: string, uri: string) {
     if (chain && account) {
       let storyClient = await initializeStoryClient();
 
       const registeredIpAssetResponse = await storyClient?.ipAsset.register({
-        nftContract: '0x7ee32b8b515dee0ba2f25f612a04a731eec24f49' as Address,
+        nftContract: '0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc' as Address,
         tokenId,
         txOptions: { waitForTransaction: true },
-        //metadata: { metadataURI: imagePreview ?? undefined, metadataHash: '', nftMetadataHash: '' },
+        metadata: {
+          metadataURI: 'test-uri', // uri of IP metadata
+          metadataHash: toHex('test-metadata-hash', { size: 32 }), // hash of IP metadata
+          nftMetadataHash: toHex('test-nft-metadata-hash', { size: 32 }), // hash of NFT metadata
+        },
       });
       console.log(
         `Root IPA created at transaction hash ${registeredIpAssetResponse?.txHash}, IPA ID: ${registeredIpAssetResponse?.ipId}`
@@ -121,10 +144,8 @@ const useCreateNft = () => {
         account,
       });
 
-      console.log(viemClientWallet.account);
-
       const config: StoryConfig = {
-        transport: http('https://ethereum-sepolia-rpc.publicnode.com'),
+        transport: custom(viemClientWallet.transport),
         account: viemClientWallet.account,
         chainId: 'sepolia',
       };
