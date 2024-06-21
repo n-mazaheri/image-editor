@@ -1,7 +1,11 @@
+import { ConnectButton } from 'thirdweb/react';
 import Clear from '../clear/clear';
 import ImageSaver from '../imageSaver/imageSaver';
 import ImageUploader from '../imageUploader/imageUploader';
 import styles from './header.module.css';
+import { createThirdwebClient } from 'thirdweb';
+import { sepolia, ethereum, polygon, arbitrum } from 'thirdweb/chains';
+import IPAsset from '../ipAsset/ipAsset';
 
 /**
  * Header component for the image app editor.
@@ -12,10 +16,15 @@ import styles from './header.module.css';
  *   - Upload image to the canvas.
  *   - Save the current state of the canvas as an image.
  *   - Clear the canvas.
+ *   - Connect to wallet
+ *   - Registe IP Asset
+ *
  *
  * @returns A React component that renders the header section of the website.
  */
 export default function Header() {
+  let client = createThirdwebClient({ clientId: 'ccd77719917b46d2ceb86aa408e8f6af' });
+
   return (
     <div className={styles.header}>
       {/* Logo and application name */}
@@ -29,6 +38,14 @@ export default function Header() {
         <ImageUploader />
         <ImageSaver />
         <Clear />
+        <ConnectButton
+          client={client}
+          theme="light"
+          chains={[sepolia, ethereum, polygon, arbitrum]}
+          connectButton={{ className: styles.connect }}
+          detailsButton={{ className: styles.connect }}
+        ></ConnectButton>
+        <IPAsset />
       </div>
     </div>
   );

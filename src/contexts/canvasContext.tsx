@@ -19,6 +19,12 @@ interface CanvasContextType {
   selectedShapes: fabric.Object[] | null; // State for currently selected objects on canvas
   setSelectedShapes: React.Dispatch<React.SetStateAction<fabric.Object[] | null>>; // Function to set selected objects
   getCanvasAtResoution: (newWidth: number, newHeight: number) => void; // Function to resize canvas and objects
+  createDataUrl: (
+    imagePreview: string | null,
+    imageWidth: number,
+    imageHeight: number,
+    imageType: string
+  ) => Promise<string | null>;
 }
 
 // Create the canvas context with initial default values
@@ -42,6 +48,9 @@ const CanvasContext = createContext<CanvasContextType>({
   selectedShapes: [],
   setSelectedShapes: () => {},
   getCanvasAtResoution: () => {},
+  createDataUrl: () => {
+    return Promise.resolve(null);
+  },
 });
 
 // Props interface for the CanvasProvider component
@@ -68,7 +77,63 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
       }
     });
   };
+  const createDataUrl = (
+    imagePreview: string | null,
+    imageWidth: number,
+    imageHeight: number,
+    imageType: string
+  ): Promise<string | null> => {
+    return new Promise((resolve, reject) => {
+      let dataURL: string | null | undefined = null;
+      const offScreenCanvas = new fabric.Canvas(null, { width: imageWidth, height: imageHeight });
 
+      if (imagePreview) {
+        // Set the original image as the background of the off-screen canvas
+        fabric.Image.fromURL(
+          imagePreview,
+          (img) => {
+            offScreenCanvas.setBackgroundImage(img, offScreenCanvas.renderAll.bind(offScreenCanvas), {
+              top: 0,
+              left: 0,
+              originX: 'left',
+              originY: 'top',
+            });
+
+            const displayWidth = canvasRef.current?.width;
+            const displayHeight = canvasRef.current?.height;
+            const scaleX = imageWidth / (displayWidth ?? 1);
+            const scaleY = imageHeight / (displayHeight ?? 1);
+
+            // Copy all objects from the main canvas to the off-screen canvas
+            canvasRef.current?.getObjects().forEach((obj) => {
+              const clone = fabric.util.object.clone(obj);
+              clone.set({
+                scaleX: clone.scaleX * scaleX,
+                scaleY: clone.scaleY * scaleY,
+                left: clone.left * scaleX,
+                top: clone.top * scaleY,
+              });
+              offScreenCanvas.add(clone);
+            });
+
+            // Render the off-screen canvas
+            offScreenCanvas.renderAll();
+
+            // Save the off-screen canvas as an image
+            dataURL = offScreenCanvas.toDataURL({
+              format: imageType,
+              quality: 1.0,
+            });
+
+            resolve(dataURL); // Resolve the promise with the dataURL
+          },
+          {
+            crossOrigin: 'Anonymous', // Add this if you are facing cross-origin issues
+          }
+        );
+      }
+    });
+  };
   // Function to remove currently selected objects from canvas
   const removeSelectedObjects = () => {
     if (selectedShapes && canvasRef?.current) {
@@ -239,6 +304,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     setSelectedShapes,
     removeSelectedObjects,
     getCanvasAtResoution,
+    createDataUrl,
   };
 
   // Render the context provider with the context value and children components

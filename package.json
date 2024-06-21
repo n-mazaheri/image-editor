@@ -5,6 +5,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@reduxjs/toolkit": "^2.2.5",
+    "@story-protocol/core-sdk": "^1.0.0-rc.14",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -12,23 +13,32 @@
     "@types/node": "^16.18.98",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "buffer": "^6.0.3",
     "classnames": "^2.5.1",
+    "crypto-browserify": "^3.12.0",
     "fabric": "^5.3.0",
     "fabricjs-react": "^1.2.2",
+    "os-browserify": "^0.3.0",
+    "process": "^0.11.10",
     "react": "^18.3.1",
     "react-color": "^2.19.3",
     "react-dom": "^18.3.1",
     "react-redux": "^9.1.2",
     "react-scripts": "5.0.1",
     "rgb-hex": "^4.1.0",
-    "typescript": "^4.9.5",
+    "stream-browserify": "^3.0.0",
+    "thirdweb": "^5.29.6",
+    "typescript": "^5",
     "uuid": "^10.0.0",
     "web-vitals": "^2.1.4"
   },
+  "overrides": {
+    "typescript": "^5"
+  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -52,6 +62,8 @@
   "devDependencies": {
     "@types/fabric": "^5.3.7",
     "@types/react-color": "^3.0.12",
-    "@types/uuid": "^9.0.8"
+    "@types/uuid": "^9.0.8",
+    "path-browserify": "^1.0.1",
+    "react-app-rewired": "^2.2.1"
   }
 }

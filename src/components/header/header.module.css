@@ -18,6 +18,7 @@
   margin-top: 1rem;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 .name {
   font-weight: 700;
@@ -33,6 +34,27 @@
   justify-content: center;
   align-items: center;
   gap: 1rem;
+}
+.connect {
+  height: 2.3rem !important;
+  font-size: 0.8rem !important;
+  min-width: unset !important;
+  padding: 0.4rem !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 0.1rem !important;
+  border-style: none !important;
+}
+.connect div img {
+  height: 1.5rem !important;
+  width: 1.5rem !important;
+}
+.connect div {
+  gap: 0 !important;
+}
+
+.connect div span {
+  color: white !important;
 }
 
 @media only screen and (max-width: 600px) {

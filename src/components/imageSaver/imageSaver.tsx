@@ -20,7 +20,7 @@ import {
  * @returns A React component that renders a save button.
  */
 export default function ImageSaver() {
-  const { canvasRef } = useContext(CanvasContext);
+  const { canvasRef, createDataUrl } = useContext(CanvasContext);
   const imageHeight = useSelector(selectImageHeight);
   const imageWidth = useSelector(selectImageWidth);
   const imageType = useSelector(selectImageType);
@@ -31,49 +31,14 @@ export default function ImageSaver() {
    * If a background image is present, it uses an off-screen canvas with the original image size to avoid quality loss.
    * If no background image is present, it saves the canvas directly.
    */
-  const saveCanvasAsImage = () => {
+  const saveCanvasAsImage = async () => {
     if (canvasRef?.current) {
-      const offScreenCanvas = new fabric.Canvas(null, { width: imageWidth, height: imageHeight });
       if (imagePreview) {
-        // Set the original image as the background of the off-screen canvas
-        fabric.Image.fromURL(imagePreview, (img) => {
-          offScreenCanvas.setBackgroundImage(img, offScreenCanvas.renderAll.bind(offScreenCanvas), {
-            top: 0,
-            left: 0,
-            originX: 'left',
-            originY: 'top',
-          });
-          const displayWidth = canvasRef.current?.width;
-          const displayHeight = canvasRef.current?.height;
-          const scaleX = imageWidth / (displayWidth ?? 1);
-          const scaleY = imageHeight / (displayHeight ?? 1);
-
-          // Copy all objects from the main canvas to the off-screen canvas
-          canvasRef.current?.getObjects().forEach((obj) => {
-            const clone = fabric.util.object.clone(obj);
-            clone.set({
-              scaleX: clone.scaleX * scaleX,
-              scaleY: clone.scaleY * scaleY,
-              left: clone.left * scaleX,
-              top: clone.top * scaleY,
-            });
-            offScreenCanvas.add(clone);
-          });
-
-          // Render the off-screen canvas
-          offScreenCanvas.renderAll();
-
-          // Save the off-screen canvas as an image
-          const dataURL = offScreenCanvas.toDataURL({
-            format: imageType,
-            quality: 1.0,
-          });
-
-          const link = document.createElement('a');
-          link.href = dataURL;
-          link.download = 'canvas-image.' + imageType;
-          link.click();
-        });
+        const dataURL = await createDataUrl(imagePreview, imageWidth, imageHeight, imageType);
+        const link = document.createElement('a');
+        link.href = dataURL!;
+        link.download = 'canvas-image.' + imageType;
+        link.click();
       } else {
         // Save the current canvas directly if no background image is present
         const dataURL = canvasRef?.current.toDataURL({
