@@ -13,6 +13,15 @@ import { fabric } from 'fabric';
 import { CanvasContext } from '../../contexts/canvasContext';
 import useDimensions from '../../hooks/dimention';
 
+/**
+ * ImageView component for the image app editor.
+ *
+ * This component contains the canvas where images are displayed and manipulated.
+ * On load, it initializes the canvas with a blank canvas and sets the `canvasRef` value in the CanvasContext.
+ * When a user uploads an image, it sets that image as the canvas background and resizes the canvas to fill 80% of the window width.
+ *
+ * @returns A React component that renders the canvas element.
+ */
 export default function ImageView() {
   const imagePreview = useSelector(selectImagePreview);
   const { canvasRef, getCanvasAtResoution } = useContext(CanvasContext);
@@ -21,6 +30,9 @@ export default function ImageView() {
   const imageHeight = useSelector(selectImageHeight);
   const imageWidth = useSelector(selectImageWidth);
 
+  /**
+   * Effect to resize the canvas when the image preview is updated or the window width changes.
+   */
   useEffect(() => {
     if (imagePreview && canvasRef?.current) {
       const containerWidth = window.innerWidth * 0.8; // 80% of window width
@@ -31,7 +43,9 @@ export default function ImageView() {
     }
   }, [width, imageHeight, imageWidth, imagePreview]);
 
-  // Initialize Fabric.js canvas
+  /**
+   * Effect to initialize the Fabric.js canvas on component mount.
+   */
   useEffect(() => {
     if (canvasRef && !canvasRef.current) {
       canvasRef.current = new fabric.Canvas('canvas');
@@ -41,6 +55,9 @@ export default function ImageView() {
     }
   }, []);
 
+  /**
+   * Effect to set the uploaded image as the canvas background and resize the canvas.
+   */
   useEffect(() => {
     if (canvasRef?.current && imagePreview) {
       fabric.Image.fromURL(imagePreview, (img) => {

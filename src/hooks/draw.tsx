@@ -18,7 +18,7 @@ import {
 } from '../redux/slices/canvasSlice';
 
 export enum ShapeType {
-  ELLIPES = 'Ellipes',
+  ELLIPSE = 'Ellipse',
   LINE = 'Line',
   RECT = 'Rectangle',
   TEXT = 'Text',
@@ -37,41 +37,57 @@ declare module 'fabric' {
   }
 }
 
+/**
+ * Custom hook for drawing various shapes on a canvas.
+ *
+ * @param shapeType - Type of shape to draw (from ShapeType enum).
+ * @returns Object with methods and state related to drawing shapes.
+ */
 const useDrawShape = (shapeType: ShapeType) => {
   const { canvasRef, lockObjects, unlockObjects, selectedShapes, setSelectedShapes, removeSelectedObjects } =
     useContext(CanvasContext);
+
   const dispatch = useDispatch();
+
+  // State variables to manage drawing process
   const [isDrawing, setIsDrawing] = useState(false);
   const [shape, setShape] = useState<fabric.Object | null>(null);
   const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([]);
   const [lines, setLines] = useState<fabric.Line[]>([]);
-  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [startPos, setStartPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Selectors to get current style settings from Redux store
   const strokeColor = useSelector(selectStrokeColor);
   const strokeWidth = useSelector(selectStrokewidth);
   const fillColor = useSelector(selectFillColor);
   const fontSize = useSelector(selectFontSize);
   const textColor = useSelector(selectTextColor);
 
+  // Function to initiate drawing mode
   const startDrawing = () => {
-    dispatch(setRequestUngroupActiveGroup(true));
-    setIsDrawing(true);
+    dispatch(setRequestUngroupActiveGroup(true)); // Request ungrouping active group if any
+    setIsDrawing(true); // Set drawing mode to true
     if (canvasRef?.current) {
-      canvasRef.current.defaultCursor = 'crosshair'; // Set cursor to crosshair
-      lockObjects();
+      canvasRef.current.defaultCursor = 'crosshair'; // Change cursor to crosshair
+      lockObjects(); // Lock objects on canvas
     }
   };
 
+  // Effect to add the drawn shape to Redux store when `shape` changes
   useEffect(() => {
     if (shape) {
-      dispatch(addObject(shape.id!));
+      dispatch(addObject(shape.id!)); // Add the object's ID to Redux store
     }
   }, [shape, dispatch]);
 
+  // Function to add a point for polygon and polyline drawing
   const addPoint = (opt: fabric.IEvent<MouseEvent>) => {
     const pointer = canvasRef?.current?.getPointer(opt.e);
     let newPoint = { x: pointer?.x ?? 0, y: pointer?.y ?? 0 };
-    const points = [...polygonPoints, newPoint];
-    setPolygonPoints(points);
+    const points = [...polygonPoints, newPoint]; // Add new point to points array
+    setPolygonPoints(points); // Update state with new points
+
+    // Create a new line object for drawing
     const newLine = new fabric.Line([newPoint.x, newPoint.y, newPoint.x, newPoint.y], {
       stroke: strokeColor,
       strokeWidth,
@@ -80,18 +96,21 @@ const useDrawShape = (shapeType: ShapeType) => {
       selectable: true,
       hasControls: true,
     });
-    canvasRef?.current?.add(newLine);
-    setLines([...lines, newLine]);
-    canvasRef?.current?.renderAll();
+
+    canvasRef?.current?.add(newLine); // Add line to canvas
+    setLines([...lines, newLine]); // Update lines state with new line
+    canvasRef?.current?.renderAll(); // Render canvas
   };
 
   useEffect(() => {
+    // Event handlers for mouse actions on canvas
     const handleMouseDown = (event: fabric.IEvent<MouseEvent>) => {
       if (isDrawing && canvasRef?.current) {
-        const id = uuidv4();
+        const id = uuidv4(); // Generate unique ID for new shape
         const pointer = canvasRef.current.getPointer(event.e);
 
-        if (shapeType === ShapeType.ELLIPES) {
+        // Determine shape type and create corresponding fabric.js object
+        if (shapeType === ShapeType.ELLIPSE) {
           const newEllipse = new fabric.Ellipse({
             left: pointer.x,
             top: pointer.y,
@@ -109,7 +128,7 @@ const useDrawShape = (shapeType: ShapeType) => {
           });
           canvasRef.current.add(newEllipse);
           setShape(newEllipse);
-        } else if (shapeType === ShapeType.RECT) {
+        } else if (shapeType === ShapeType.RECT || shapeType === ShapeType.SQUARE) {
           const newRectangle = new fabric.Rect({
             left: pointer.x,
             top: pointer.y,
@@ -142,24 +161,8 @@ const useDrawShape = (shapeType: ShapeType) => {
           });
           canvasRef.current.add(newTriangle);
           setShape(newTriangle);
-        } else if (shapeType === ShapeType.SQUARE) {
-          const newRectangle = new fabric.Rect({
-            left: pointer.x,
-            top: pointer.y,
-            width: 0,
-            height: 0,
-            fill: fillColor,
-            stroke: strokeColor,
-            strokeWidth,
-            lockRotation: false,
-            selectable: true,
-            hasControls: true,
-            id,
-          });
-          canvasRef.current.add(newRectangle);
-          setShape(newRectangle);
         } else if (shapeType === ShapeType.POLYGON || shapeType === ShapeType.POLYLINE) {
-          addPoint(event);
+          addPoint(event); // Add initial point for polygon or polyline
         } else if (shapeType === ShapeType.CIRCLE) {
           const newCircle = new fabric.Circle({
             left: pointer.x,
@@ -206,14 +209,17 @@ const useDrawShape = (shapeType: ShapeType) => {
       }
     };
 
+    // Handler for mouse move events during drawing
     const handleMouseMove = (event: fabric.IEvent<MouseEvent>) => {
       if (isDrawing && canvasRef?.current && (shape || polygonPoints.length > 0)) {
         const pointer = canvasRef.current.getPointer(event.e);
-        if (shapeType === ShapeType.ELLIPES) {
+
+        // Update shape properties based on mouse movement
+        if (shapeType === ShapeType.ELLIPSE) {
           const rx = Math.abs(pointer.x - (shape!.left ?? 0));
           const ry = Math.abs(pointer.y - (shape!.top ?? 0));
           (shape as fabric.Ellipse).set({ rx, ry });
-        } else if (shapeType === ShapeType.RECT) {
+        } else if (shapeType === ShapeType.RECT || shapeType === ShapeType.SQUARE) {
           const { left, top } = shape as fabric.Rect;
           const width = pointer.x - (left ?? 0);
           const height = pointer.y - (top ?? 0);
@@ -224,27 +230,25 @@ const useDrawShape = (shapeType: ShapeType) => {
           const width = Math.abs(pointer.x - startPos.x);
           const height = Math.abs(pointer.y - startPos.y);
           (shape as fabric.Triangle).set({
-            width: width,
-            height: height,
+            width,
+            height,
             left: Math.min(pointer.x, startPos.x),
             top: Math.min(pointer.y, startPos.y),
           });
-        } else if (shapeType === ShapeType.SQUARE) {
-          const width = Math.abs(pointer.x - (shape!.left ?? 0));
-          const height = Math.abs(pointer.y - (shape!.top ?? 0));
-          (shape as fabric.Rect).set({ width: Math.max(width, height), height: Math.max(width, height) });
         } else if (shapeType === ShapeType.LINE) {
           (shape as fabric.Line).set({ x2: pointer.x, y2: pointer.y });
         } else if (shapeType === ShapeType.CIRCLE) {
           const radius = Math.hypot(pointer.x - (shape!.left ?? 0), pointer.y - (shape!.top ?? 0));
-          (shape as fabric.Circle).set({ radius: radius });
+          (shape as fabric.Circle).set({ radius });
         } else if (shapeType === ShapeType.POLYGON || shapeType === ShapeType.POLYLINE) {
           lines[lines.length - 1].set({ x2: pointer.x, y2: pointer.y });
         }
-        canvasRef.current.renderAll();
+
+        canvasRef.current.renderAll(); // Render canvas with updated shapes
       }
     };
 
+    // Handler for double-click event to finish drawing polygon or polyline
     const handleDoubleClick = () => {
       if (shapeType === ShapeType.POLYGON || shapeType === ShapeType.POLYLINE) {
         if (polygonPoints.length > 2) {
@@ -254,7 +258,7 @@ const useDrawShape = (shapeType: ShapeType) => {
               ? new fabric.Polygon(polygonPoints, {
                   fill: fillColor,
                   stroke: strokeColor,
-                  strokeWidth: strokeWidth,
+                  strokeWidth,
                   selectable: true,
                   hasControls: true,
                   lockRotation: false,
@@ -263,43 +267,46 @@ const useDrawShape = (shapeType: ShapeType) => {
               : new fabric.Polyline(polygonPoints, {
                   fill: '#00000000',
                   stroke: strokeColor,
-                  strokeWidth: strokeWidth,
+                  strokeWidth,
                   selectable: true,
                   hasControls: true,
                   lockRotation: false,
                   id,
                 });
-          canvasRef?.current?.add(polygon);
-          dispatch(addObject(id));
-          setPolygonPoints([]);
-          dispatch(setRequestUngroupActiveGroup(false));
-          setIsDrawing(false);
-          unlockObjects();
-          setShape(null);
+
+          canvasRef?.current?.add(polygon); // Add polygon or polyline to canvas
+          dispatch(addObject(id)); // Add object ID to Redux store
+          setPolygonPoints([]); // Clear polygon points
+          dispatch(setRequestUngroupActiveGroup(false)); // Reset ungroup request
+          setIsDrawing(false); // Exit drawing mode
+          unlockObjects(); // Unlock objects on canvas
+          setShape(null); // Reset current shape
           for (let line of lines) {
-            canvasRef?.current?.remove(line);
+            canvasRef?.current?.remove(line); // Remove temporary lines
           }
-          setLines([]);
+          setLines([]); // Clear lines state
 
           if (canvasRef?.current) {
-            canvasRef.current.defaultCursor = 'default';
+            canvasRef.current.defaultCursor = 'default'; // Reset cursor to default
           }
         }
       }
     };
 
+    // Handler for mouse up event to finish drawing other shapes
     const handleMouseUp = () => {
       if (shapeType !== ShapeType.POLYGON && shapeType !== ShapeType.POLYLINE) {
-        dispatch(setRequestUngroupActiveGroup(false));
-        setIsDrawing(false);
-        unlockObjects();
-        setShape(null);
+        dispatch(setRequestUngroupActiveGroup(false)); // Reset ungroup request
+        setIsDrawing(false); // Exit drawing mode
+        unlockObjects(); // Unlock objects on canvas
+        setShape(null); // Reset current shape
         if (canvasRef?.current) {
-          canvasRef.current.defaultCursor = 'default'; // Reset cursor
+          canvasRef.current.defaultCursor = 'default'; // Reset cursor to default
         }
       }
     };
 
+    // Handler for object selected event to update style settings
     const handleObjectSelected = (event: fabric.IEvent) => {
       if (event.selected?.[0]?.type !== 'textbox') {
         dispatch(setStrokeWidth(event.selected?.[0]?.strokeWidth ?? 2));
@@ -310,21 +317,24 @@ const useDrawShape = (shapeType: ShapeType) => {
         dispatch(setTextColor(((event.selected?.[0] as fabric.Text)?.fill as string) ?? 'red'));
       }
 
-      setSelectedShapes(event.selected ?? null);
+      setSelectedShapes(event.selected ?? null); // Update selected shapes state
     };
 
+    // Handler for selection cleared event to reset selected shapes state
     const handleSelectionCleared = () => {
-      setSelectedShapes(null);
+      setSelectedShapes(null); // Clear selected shapes state
     };
 
+    // Add event listeners for canvas events
     canvasRef?.current?.on('mouse:down', handleMouseDown as (e: fabric.IEvent) => void);
     canvasRef?.current?.on('mouse:move', handleMouseMove as (e: fabric.IEvent) => void);
     canvasRef?.current?.on('mouse:up', handleMouseUp as (e: fabric.IEvent) => void);
     canvasRef?.current?.on('selection:created', handleObjectSelected as (e: fabric.IEvent) => void);
     canvasRef?.current?.on('selection:updated', handleObjectSelected as (e: fabric.IEvent) => void);
     canvasRef?.current?.on('selection:cleared', handleSelectionCleared as (e: fabric.IEvent) => void);
-    canvasRef?.current?.on('mouse:dblclick', handleDoubleClick);
+    canvasRef?.current?.on('mouse:dblclick', handleDoubleClick as (e: fabric.IEvent) => void);
 
+    // Clean up event listeners when component unmounts or dependencies change
     return () => {
       canvasRef?.current?.off('mouse:down', handleMouseDown as (e: fabric.IEvent) => void);
       canvasRef?.current?.off('mouse:move', handleMouseMove as (e: fabric.IEvent) => void);
@@ -332,39 +342,45 @@ const useDrawShape = (shapeType: ShapeType) => {
       canvasRef?.current?.off('selection:created', handleObjectSelected as (e: fabric.IEvent) => void);
       canvasRef?.current?.off('selection:updated', handleObjectSelected as (e: fabric.IEvent) => void);
       canvasRef?.current?.off('selection:cleared', handleSelectionCleared as (e: fabric.IEvent) => void);
-      canvasRef?.current?.off('mouse:dblclick', handleDoubleClick);
+      canvasRef?.current?.off('mouse:dblclick', handleDoubleClick as (e: fabric.IEvent) => void);
     };
   }, [isDrawing, shape, strokeColor, strokeWidth, canvasRef, fontSize, fillColor, textColor, polygonPoints, shapeType]);
 
+  // Effect to update selected shapes' styles when related state changes
   useEffect(() => {
     if (selectedShapes && canvasRef?.current) {
-      selectedShapes.map((shape) => {
+      selectedShapes.forEach((shape) => {
         if (shape.type !== 'textbox') {
           shape.set('stroke', strokeColor);
           shape.set('strokeWidth', strokeWidth);
-          if (shape.type != 'line') shape.set('fill', fillColor);
+          if (shape.type !== 'line') shape.set('fill', fillColor);
         } else {
           shape.set('fill', textColor);
           (shape as fabric.Textbox).set('fontSize', fontSize);
         }
       });
-      canvasRef.current.renderAll();
+
+      canvasRef.current.renderAll(); // Render canvas with updated styles
     }
   }, [strokeColor, selectedShapes, canvasRef, fontSize, strokeWidth, fillColor, textColor]);
 
+  // Effect to handle keyboard events for deleting selected objects
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Delete' || event.key === 'Backspace') {
-        removeSelectedObjects();
+        removeSelectedObjects(); // Remove selected objects from canvas
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown); // Add event listener for key down
+
+    // Clean up event listener when component unmounts or dependencies change
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown); // Remove event listener
     };
   }, [selectedShapes, canvasRef]);
 
+  // Return methods and state variables for drawing shapes
   return { startDrawing, isDrawing };
 };
 

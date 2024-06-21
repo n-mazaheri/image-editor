@@ -15,10 +15,21 @@ import {
 import classNames from 'classnames';
 import { useContext, useEffect } from 'react';
 import { CanvasContext } from '../../contexts/canvasContext';
+
+/**
+ * Layers component for managing layers in the canvas.
+ *
+ * Each layer is a set of objects. This component allows the user to select the active layer,
+ * move layers up and down (reordering them), remove layers, toggle layer visibility,
+ * and group or ungroup objects within layers. Layer information is stored in Redux, and
+ * canvas object manipulation is handled through the CanvasContext.
+ *
+ * @returns A React component for managing layers.
+ */
 export default function Layers() {
-  const layers = useSelector(selectLayers);
-  const activeLayer = useSelector(selectActiveLayer);
-  const ungroupActiveGroup = useSelector(selectRequestUngroupActiveGroup);
+  const layers = useSelector(selectLayers); // Get layers from Redux store
+  const activeLayer = useSelector(selectActiveLayer); // Get the currently active layer from Redux store
+  const ungroupActiveGroup = useSelector(selectRequestUngroupActiveGroup); // Get the request to ungroup active group from Redux store
   const {
     canvasRef,
     removeObjects,
@@ -27,75 +38,88 @@ export default function Layers() {
     rearrengeObjects,
     makeObjectsGroup,
     makeObjectsUngroup,
-  } = useContext(CanvasContext);
+  } = useContext(CanvasContext); // Access canvas manipulation functions from CanvasContext
 
+  // Effect to re-arrange objects in the canvas when layers change
   useEffect(() => {
     rearrengeObjects(layers);
   }, [layers]);
 
+  // Effect to handle ungrouping of objects when requested
   useEffect(() => {
-    if (ungroupActiveGroup == true && activeLayer) {
-      let activeLayerInfo = layers.find((la) => la.id == activeLayer);
-      if (activeLayerInfo && activeLayerInfo.grouped == true) {
-        handleLayerGroup(activeLayer, false, layers.find((la) => la.id == activeLayer)?.objects ?? []);
+    if (ungroupActiveGroup === true && activeLayer) {
+      let activeLayerInfo = layers.find((la) => la.id === activeLayer);
+      if (activeLayerInfo && activeLayerInfo.grouped === true) {
+        handleLayerGroup(activeLayer, false, layers.find((la) => la.id === activeLayer)?.objects ?? []);
       }
     }
   }, [ungroupActiveGroup]);
 
   const dispatch = useDispatch();
+
+  // Function to add a new layer
   const addLayerLocal = () => {
     dispatch(addLayer());
   };
+
+  // Function to remove a layer and its objects
   const removeLayerLocal = (layerId: number) => {
     if (canvasRef?.current) {
-      let objects = layers.find((layer) => layer.id == layerId)?.objects ?? [];
-      removeObjects(objects);
+      let objects = layers.find((layer) => layer.id === layerId)?.objects ?? [];
+      removeObjects(objects); // Remove objects from the canvas
     }
-    dispatch(removeLayer(layerId));
+    dispatch(removeLayer(layerId)); // Remove layer from Redux store
   };
+
+  // Function to move a layer up in the order
   const moveUp = (index: number) => {
     if (index > 0) {
       dispatch(moveLayerUp(index));
       if (canvasRef?.current) {
-        rearrengeObjects(layers);
+        rearrengeObjects(layers); // Re-arrange objects in the canvas
       }
     }
   };
+
+  // Function to move a layer down in the order
   const moveDown = (index: number) => {
     if (index < layers.length - 1) {
       dispatch(moveLayerDown(index));
-
       if (canvasRef?.current) {
-        rearrengeObjects(layers);
+        rearrengeObjects(layers); // Re-arrange objects in the canvas
       }
     }
   };
+
+  // Function to set the active layer
   const setActiveLayerLocal = (layer: number) => {
     dispatch(setActiveLayer(layer));
   };
 
+  // Function to handle layer visibility toggling
   const handleLayerVisibility = (layerId: number, visible: boolean, objectIds: string[]) => {
-    if (visible == true) {
-      makeObjectsVisible(objectIds);
+    if (visible === true) {
+      makeObjectsVisible(objectIds); // Make objects visible in the canvas
     } else {
-      makeObjectsInvisible(objectIds);
+      makeObjectsInvisible(objectIds); // Make objects invisible in the canvas
     }
-    dispatch(changeLayerVisibility({ id: layerId, visible }));
+    dispatch(changeLayerVisibility({ id: layerId, visible })); // Update layer visibility in Redux store
   };
 
+  // Function to handle grouping or ungrouping of layer objects
   const handleLayerGroup = (layerId: number, grouped: boolean, objectIds: string[]) => {
     let removed: string[] = [];
     let added: string[] = [];
-    if (grouped == true) {
-      let id = makeObjectsGroup(objectIds);
+    if (grouped === true) {
+      let id = makeObjectsGroup(objectIds); // Group objects in the canvas
       added.push(id);
-      removed = ([] as string[]).concat(removed, objectIds);
+      removed = removed.concat(objectIds);
     } else {
-      let ids = makeObjectsUngroup(objectIds);
-      removed = ([] as string[]).concat(removed, objectIds);
-      added = ([] as string[]).concat(added, ids);
+      let ids = makeObjectsUngroup(objectIds); // Ungroup objects in the canvas
+      removed = removed.concat(objectIds);
+      added = added.concat(ids);
     }
-    dispatch(changeLayerGroup({ layerId, grouped, added, removed }));
+    dispatch(changeLayerGroup({ layerId, grouped, added, removed })); // Update layer grouping in Redux store
   };
 
   return (
@@ -107,11 +131,10 @@ export default function Layers() {
       <div className={styles.layersParrent}>
         {layers.map((layer, index) => (
           <div className={styles.mainRow} key={'layer' + layer.id}>
-            {' '}
             <div className={styles.layerRow}>
               <button onClick={() => moveUp(index)}>∧</button>
               <div
-                className={classNames(styles.layersDiv, layer.id == activeLayer ? styles.activeLayer : '')}
+                className={classNames(styles.layersDiv, layer.id === activeLayer ? styles.activeLayer : '')}
                 onClick={() => setActiveLayerLocal(layer.id)}
               >
                 {layer.id}
@@ -120,7 +143,6 @@ export default function Layers() {
               <button onClick={() => removeLayerLocal(layer.id)}>-</button>
             </div>
             <div className={styles.layerRow2}>
-              {' '}
               <input
                 type="checkbox"
                 checked={layer.visible}
@@ -137,7 +159,7 @@ export default function Layers() {
                   handleLayerGroup(layer.id, !layer.grouped, layer.objects);
                 }}
                 id="GroupedCheck"
-              ></input>{' '}
+              ></input>
               <label htmlFor="GroupedCheck">Group</label>
             </div>
           </div>

@@ -2,24 +2,26 @@ import React, { ReactNode, createContext, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 import { v4 as uuidv4 } from 'uuid';
 
+// Define the type for the context values
 interface CanvasContextType {
-  canvasRef: React.MutableRefObject<fabric.Canvas | null> | null;
-  getObjectById: (id: string) => fabric.Object | undefined;
-  removeObjects: (ids: string[]) => void;
-  removeSelectedObjects: () => void;
-  makeObjectsInvisible: (ids: string[]) => void;
-  makeObjectsVisible: (ids: string[]) => void;
-  makeObjectsGroup: (ids: string[]) => string;
-  makeObjectsUngroup: (ids: string[]) => string[];
-  rearrengeObjects: (layers: { id: number; objects: string[]; visible: boolean }[]) => void;
-  lockObjects: () => void;
-  unlockObjects: () => void;
-  clearCanvas: () => void;
-  selectedShapes: fabric.Object[] | null;
-  setSelectedShapes: React.Dispatch<React.SetStateAction<fabric.Object[] | null>>;
-  getCanvasAtResoution: (newWidth: number, newHeight: number) => void;
+  canvasRef: React.MutableRefObject<fabric.Canvas | null> | null; // Reference to the Fabric.js canvas
+  getObjectById: (id: string) => fabric.Object | undefined; // Function to get Fabric.js object by ID
+  removeObjects: (ids: string[]) => void; // Function to remove objects from canvas by their IDs
+  removeSelectedObjects: () => void; // Function to remove currently selected objects from canvas
+  makeObjectsInvisible: (ids: string[]) => void; // Function to make objects with given IDs invisible
+  makeObjectsVisible: (ids: string[]) => void; // Function to make objects with given IDs visible
+  makeObjectsGroup: (ids: string[]) => string; // Function to group objects with given IDs into a new group
+  makeObjectsUngroup: (ids: string[]) => string[]; // Function to ungroup a group with given IDs into individual objects
+  rearrengeObjects: (layers: { id: number; objects: string[]; visible: boolean }[]) => void; // Function to rearrange objects based on layers
+  lockObjects: () => void; // Function to lock (disable interaction) all objects on canvas
+  unlockObjects: () => void; // Function to unlock (enable interaction) all objects on canvas
+  clearCanvas: () => void; // Function to clear all objects from the canvas
+  selectedShapes: fabric.Object[] | null; // State for currently selected objects on canvas
+  setSelectedShapes: React.Dispatch<React.SetStateAction<fabric.Object[] | null>>; // Function to set selected objects
+  getCanvasAtResoution: (newWidth: number, newHeight: number) => void; // Function to resize canvas and objects
 }
 
+// Create the canvas context with initial default values
 const CanvasContext = createContext<CanvasContextType>({
   canvasRef: null,
   getObjectById: () => undefined,
@@ -41,19 +43,25 @@ const CanvasContext = createContext<CanvasContextType>({
   setSelectedShapes: () => {},
   getCanvasAtResoution: () => {},
 });
+
+// Props interface for the CanvasProvider component
 interface CanvasProviderProps {
-  children: ReactNode;
+  children: ReactNode; // Children elements that will have access to the canvas context
 }
 
+// CanvasProvider component manages the Fabric.js canvas and provides context to its children
 const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
-  const canvasRef = useRef<fabric.Canvas | null>(null);
-  const [selectedShapes, setSelectedShapes] = useState<fabric.Object[] | null>(null);
+  const canvasRef = useRef<fabric.Canvas | null>(null); // Reference to the Fabric.js canvas
+  const [selectedShapes, setSelectedShapes] = useState<fabric.Object[] | null>(null); // State to hold selected objects
+
+  // Function to get Fabric.js object by its ID
   const getObjectById = (id: string) => {
     return canvasRef.current?.getObjects().find((obj) => obj.id === id);
   };
 
+  // Function to remove objects from canvas by their IDs
   const removeObjects = (ids: string[]) => {
-    ids.map((id) => {
+    ids.forEach((id) => {
       const object = getObjectById(id);
       if (object) {
         canvasRef.current?.remove(object);
@@ -61,6 +69,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     });
   };
 
+  // Function to remove currently selected objects from canvas
   const removeSelectedObjects = () => {
     if (selectedShapes && canvasRef?.current) {
       selectedShapes.forEach((shape) => {
@@ -72,6 +81,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     }
   };
 
+  // Function to rearrange objects based on layers configuration
   const rearrengeObjects = (layers: { id: number; objects: string[]; visible: boolean }[]) => {
     let index = 0;
     for (let layer of layers) {
@@ -84,8 +94,9 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     canvasRef?.current?.renderAll();
   };
 
+  // Function to make objects with given IDs invisible
   const makeObjectsInvisible = (ids: string[]) => {
-    ids.map((id) => {
+    ids.forEach((id) => {
       let object = getObjectById(id);
       if (object) {
         object.visible = false;
@@ -93,8 +104,10 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     });
     canvasRef?.current?.renderAll();
   };
+
+  // Function to make objects with given IDs visible
   const makeObjectsVisible = (ids: string[]) => {
-    ids.map((id) => {
+    ids.forEach((id) => {
       let object = getObjectById(id);
       if (object) {
         object.visible = true;
@@ -102,6 +115,8 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     });
     canvasRef?.current?.renderAll();
   };
+
+  // Function to group objects with given IDs into a new group
   const makeObjectsGroup = (ids: string[]) => {
     let id = uuidv4();
     let objects: fabric.Object[] = [];
@@ -123,6 +138,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     return id;
   };
 
+  // Function to ungroup a group with given IDs into individual objects
   const makeObjectsUngroup = (ids: string[]) => {
     let objects: fabric.Object[] = [];
     let resultIds: string[] = [];
@@ -153,6 +169,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     return resultIds;
   };
 
+  // Function to lock (disable interaction) all objects on canvas
   const lockObjects = () => {
     canvasRef?.current?.getObjects().forEach((obj) => {
       obj.selectable = false;
@@ -161,6 +178,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     canvasRef?.current?.renderAll();
   };
 
+  // Function to unlock (enable interaction) all objects on canvas
   const unlockObjects = () => {
     canvasRef?.current?.getObjects().forEach((obj) => {
       obj.selectable = true;
@@ -169,11 +187,13 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     canvasRef?.current?.renderAll();
   };
 
+  // Function to clear all objects from the canvas
   const clearCanvas = () => {
     canvasRef.current?.clear();
     canvasRef?.current?.renderAll();
   };
 
+  // Function to resize canvas and objects based on new width and height
   const getCanvasAtResoution = (newWidth: number, newHeight: number) => {
     if (canvasRef?.current) {
       let canvas = canvasRef.current;
@@ -202,6 +222,7 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     }
   };
 
+  // Provide the context value to the children components
   const contextValue: CanvasContextType = {
     canvasRef,
     getObjectById,
@@ -219,7 +240,10 @@ const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     removeSelectedObjects,
     getCanvasAtResoution,
   };
+
+  // Render the context provider with the context value and children components
   return <CanvasContext.Provider value={contextValue}>{children}</CanvasContext.Provider>;
 };
 
+// Export both the context and provider for use in other components
 export { CanvasContext, CanvasProvider };
