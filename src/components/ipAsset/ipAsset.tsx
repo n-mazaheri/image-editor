@@ -100,7 +100,7 @@ function ProcessModal(props: { setOpenModal: React.Dispatch<React.SetStateAction
                 : ''}
             </span>
             {link && (
-              <a href={link!} style={{ marginLeft: 5 }}>
+              <a href={link!} style={{ marginLeft: 5 }} target="_blank">
                 Image Link
               </a>
             )}
