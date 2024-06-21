@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
 import useCreateNft from '../../hooks/createNft';
 import styles from './ipAsset.module.css';
-import { useActiveAccount } from 'thirdweb/react';
+import { useActiveAccount, useActiveWalletChain } from 'thirdweb/react';
+import { sepolia } from 'thirdweb/chains';
+import { useSwitchActiveWalletChain } from 'thirdweb/react';
 
 export default function IPAsset() {
   let account = useActiveAccount();
   let userAddress = account?.address;
+  let chain = useActiveWalletChain();
+  const switchChain = useSwitchActiveWalletChain();
+
   const [openModal, setOpenModal] = useState(false);
   const [showSpan, setShowSpan] = useState(false);
   return (
@@ -14,14 +19,23 @@ export default function IPAsset() {
       <div>
         <button
           onClick={async () => {
-            if (userAddress) {
-              setOpenModal(true);
-            } else {
+            if (!userAddress) {
               setShowSpan(true);
               setTimeout(() => {
                 setShowSpan(false);
               }, 1000);
+
+              return;
             }
+            if (chain?.id != sepolia.id) {
+              switchChain(sepolia)
+                .then((res) => {
+                  setOpenModal(true);
+                })
+                .catch(() => {});
+              return;
+            }
+            setOpenModal(true);
           }}
           className="toolboxButton"
         >
