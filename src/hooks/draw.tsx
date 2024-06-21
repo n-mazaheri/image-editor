@@ -55,6 +55,8 @@ const useDrawShape = (shapeType: ShapeType) => {
   const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([]);
   const [lines, setLines] = useState<fabric.Line[]>([]);
   const [startPos, setStartPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [originX, setOriginX] = useState(0);
+  const [originY, setOriginY] = useState(0);
 
   // Selectors to get current style settings from Redux store
   const strokeColor = useSelector(selectStrokeColor);
@@ -129,11 +131,16 @@ const useDrawShape = (shapeType: ShapeType) => {
           canvasRef.current.add(newEllipse);
           setShape(newEllipse);
         } else if (shapeType === ShapeType.RECT || shapeType === ShapeType.SQUARE) {
+          setOriginX(pointer.x);
+          setOriginY(pointer.y);
           const newRectangle = new fabric.Rect({
             left: pointer.x,
             top: pointer.y,
+            originX: 'left',
+            originY: 'top',
             width: 0,
             height: 0,
+            angle: 0,
             fill: fillColor,
             stroke: strokeColor,
             strokeWidth,
@@ -142,6 +149,7 @@ const useDrawShape = (shapeType: ShapeType) => {
             hasControls: true,
             id,
           });
+
           canvasRef.current.add(newRectangle);
           setShape(newRectangle);
         } else if (shapeType === ShapeType.TRIANGLE) {
@@ -167,6 +175,8 @@ const useDrawShape = (shapeType: ShapeType) => {
           const newCircle = new fabric.Circle({
             left: pointer.x,
             top: pointer.y,
+            originX: 'center',
+            originY: 'center',
             radius: 0,
             fill: fillColor,
             stroke: strokeColor,
@@ -176,6 +186,8 @@ const useDrawShape = (shapeType: ShapeType) => {
             hasControls: true,
             id,
           });
+          setOriginX(pointer.x);
+          setOriginY(pointer.y);
           canvasRef.current.add(newCircle);
           setShape(newCircle);
         } else if (shapeType === ShapeType.LINE) {
@@ -220,12 +232,19 @@ const useDrawShape = (shapeType: ShapeType) => {
           const ry = Math.abs(pointer.y - (shape!.top ?? 0));
           (shape as fabric.Ellipse).set({ rx, ry });
         } else if (shapeType === ShapeType.RECT || shapeType === ShapeType.SQUARE) {
-          const { left, top } = shape as fabric.Rect;
-          const width = pointer.x - (left ?? 0);
-          const height = pointer.y - (top ?? 0);
-          (shape as fabric.Rect).set({ width: Math.abs(width), height: Math.abs(height) });
-          if (width < 0) (shape as fabric.Rect).set({ left: pointer.x });
-          if (height < 0) (shape as fabric.Rect).set({ top: pointer.y });
+          // Adjust left and top position based on mouse movement direction
+          if (originX > pointer.x) {
+            (shape as fabric.Rect).set({ left: Math.abs(pointer.x) });
+          }
+          if (originY > pointer.y) {
+            (shape as fabric.Rect).set({ top: Math.abs(pointer.y) });
+          }
+
+          // Update rectangle dimensions
+          shape?.set({
+            width: Math.abs(originX - pointer.x),
+            height: shapeType != ShapeType.SQUARE ? Math.abs(originY - pointer.y) : Math.abs(originX - pointer.x),
+          });
         } else if (shapeType === ShapeType.TRIANGLE) {
           const width = Math.abs(pointer.x - startPos.x);
           const height = Math.abs(pointer.y - startPos.y);
@@ -238,7 +257,7 @@ const useDrawShape = (shapeType: ShapeType) => {
         } else if (shapeType === ShapeType.LINE) {
           (shape as fabric.Line).set({ x2: pointer.x, y2: pointer.y });
         } else if (shapeType === ShapeType.CIRCLE) {
-          const radius = Math.hypot(pointer.x - (shape!.left ?? 0), pointer.y - (shape!.top ?? 0));
+          const radius = Math.hypot(pointer.x - originX, pointer.y - originY);
           (shape as fabric.Circle).set({ radius });
         } else if (shapeType === ShapeType.POLYGON || shapeType === ShapeType.POLYLINE) {
           lines[lines.length - 1].set({ x2: pointer.x, y2: pointer.y });
@@ -344,7 +363,20 @@ const useDrawShape = (shapeType: ShapeType) => {
       canvasRef?.current?.off('selection:cleared', handleSelectionCleared as (e: fabric.IEvent) => void);
       canvasRef?.current?.off('mouse:dblclick', handleDoubleClick as (e: fabric.IEvent) => void);
     };
-  }, [isDrawing, shape, strokeColor, strokeWidth, canvasRef, fontSize, fillColor, textColor, polygonPoints, shapeType]);
+  }, [
+    isDrawing,
+    shape,
+    strokeColor,
+    strokeWidth,
+    canvasRef,
+    fontSize,
+    fillColor,
+    textColor,
+    polygonPoints,
+    shapeType,
+    originX,
+    originY,
+  ]);
 
   // Effect to update selected shapes' styles when related state changes
   useEffect(() => {
