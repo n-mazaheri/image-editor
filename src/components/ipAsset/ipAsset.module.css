@@ -66,6 +66,10 @@
   margin-top: 0.1rem;
   font-weight: 700;
 }
+.detail {
+  font-size: 0.6rem;
+  color: rgba(32, 31, 31, 0.762);
+}
 
 @media only screen and (max-width: 600px) {
   .modal-content {

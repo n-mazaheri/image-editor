@@ -1,5 +1,13 @@
 import { StoryClient, StoryConfig } from '@story-protocol/core-sdk';
-import { Address, createThirdwebClient, getContract, prepareContractCall, simulateTransaction } from 'thirdweb';
+import {
+  Address,
+  createThirdwebClient,
+  getContract,
+  prepareContractCall,
+  sendTransaction,
+  simulateTransaction,
+  waitForReceipt,
+} from 'thirdweb';
 import { useActiveAccount, useActiveWalletChain } from 'thirdweb/react';
 import { viemAdapter } from 'thirdweb/adapters/viem';
 import { custom, toHex } from 'viem';
@@ -47,7 +55,7 @@ const useCreateNft = () => {
     },
   ] as any;
   async function mintNFT(uri: string) {
-    if (chain) {
+    if (chain && account) {
       const myContract = getContract({
         client,
         chain,
@@ -60,10 +68,10 @@ const useCreateNft = () => {
         params: [userAddress, uri],
       });
 
-      const tokenId = await simulateTransaction({ transaction });
-      console.log(tokenId);
-      console.log('fdfdsf');
+      const result = await sendTransaction({ transaction, account });
+      const receipt = await waitForReceipt(result);
 
+      const tokenId = Number(receipt?.logs?.[0].topics?.[3])?.toString();
       return tokenId;
     }
   }
@@ -111,7 +119,6 @@ const useCreateNft = () => {
     }
     let blob = dataURItoBlob(dataURL);
     const uris = await upload({ client, files: [new File([blob], 'image.' + imageType)] });
-    console.log(ipfsToHttp(uris));
     return { link: ipfsToHttp(uris), uri: uris };
   }
 
@@ -124,14 +131,16 @@ const useCreateNft = () => {
         tokenId,
         txOptions: { waitForTransaction: true },
         metadata: {
-          metadataURI: 'test-uri', // uri of IP metadata
-          metadataHash: toHex('test-metadata-hash', { size: 32 }), // hash of IP metadata
-          nftMetadataHash: toHex('test-nft-metadata-hash', { size: 32 }), // hash of NFT metadata
+          metadataURI: uri,
+          metadataHash: toHex('metadata-hash', { size: 32 }), // hash of IP metadata
+          nftMetadataHash: toHex('metadata-hash', { size: 32 }), // hash of NFT metadata
         },
       });
       console.log(
         `Root IPA created at transaction hash ${registeredIpAssetResponse?.txHash}, IPA ID: ${registeredIpAssetResponse?.ipId}`
       );
+
+      return { hash: registeredIpAssetResponse?.txHash, id: registeredIpAssetResponse?.ipId };
     }
   }
 
