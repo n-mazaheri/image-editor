@@ -40,9 +40,15 @@ When opening the page, users start with a blank canvas that can be used to desig
 
 Users can draw any shape using the shapes toolbox in the side menu. The toolbox includes circles, ellipses, polygons, polylines, squares, rectangles, triangles, and text. When a user selects a shape, the button color changes to indicate selection, and the mouse cursor inside the canvas changes to a "+". Users can draw shapes with a mouse down and drag action. After drawing the shape, the button and cursor return to the unselected state. For polygons and polylines, users should mouse down, drag, and click for each line, then double-click to finish drawing the shape.
 
+<img src="image-5.png" width="150">
+
 Users can select the fill color, stroke (border) color, and text color of shape objects using color pickers in the side menu. By clicking on each colorful rectangle, a color palette opens. Users can select any color they want and can set transparency to zero to remove color. Users can also change the colors of shapes after drawing by selecting them and changing the colors. In addition to color selection, users can select the width of the stroke (border) of shapes and the font size of texts using size pickers in the settings part of the size menu. These properties can be changed before drawing a shape or afterward by selecting the shape.
 
+<img src="image-2.png" width="150">
+
 For managing shapes inside the canvas, the application includes a layer system, managed in the layers part of the size menu. Each layer is a collection of objects. Users can add layers by clicking the "+" button. The list of layers is visible in the side menu, with one layer active at a time. Users can change the active layer by clicking the layer number button, which changes color to green. When users draw a shape, it is automatically added to the active layer. Users can remove a layer by clicking the "-" button beside the layer, which removes all objects in the layer from the canvas. To make all objects in a layer visible or invisible, users can use the visible checkbox below each layer in the layer list. Users can group or ungroup objects in one layer using the group checkbox below each layer in the layer list. When objects are grouped, users can resize, rotate, and move all of them simultaneously. Selected images are always shown on top but will move to their correct order based on layers.
+
+<img src="image-3.png" width="150">
 
 Users can change the order of layers by clicking the arrow down and arrow up buttons beside each layer in the layer list, indicating the order of objects in the canvas. Users can send back objects in a layer by clicking the up button or bring them to the front by clicking the down button. The arrangement of objects is based on their layer order: objects in the first layer are the furthest back, followed by objects in subsequent layers, with objects in the last layer being in front of all others.
 
@@ -53,6 +59,8 @@ Users can save the resulting image as an IP asset to preserve the intellectual p
 3. Register IP assets.
 
 Each of these steps shows loading, success, or error states, with details about each successful step such as the image link, tokenId of the minted NFT, and Root IPA transaction address and IPA id.
+
+<img src="image-4.png" width="350">
 
 ## Code Structure
 
