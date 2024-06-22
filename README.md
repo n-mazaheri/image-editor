@@ -31,7 +31,12 @@ To set up the project, follow these steps:
 1. Clone the repository: `git clone https://github.com/n-mazaheri/image-editor`
 2. Navigate to the project directory: `cd image-editor`
 3. Install dependencies: `npm install`
-4. Start the project: `npm start`
+4. (optional) add a .env file to the project with any desired value for these two keys (They have default values in the code and code works without any .env)
+
+   REACT_APP_NFT_ADDRESS => represent the contract address for minting nft
+   REACT_APP_THIRDWEB_TOKEN=> represent Thirdweb token Id
+
+5. Start the project: `npm start`
 
 To build the project, run the following command, and use the build folder inside the image-editor directory:
 `npm run build`
