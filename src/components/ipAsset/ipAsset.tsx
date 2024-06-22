@@ -122,7 +122,7 @@ function ProcessModal(props: {
         <span className={styles['close']} onClick={() => props.setOpenModal(false)}>
           &times;
         </span>
-        <div className={styles.modalHeader}>Register Image a IP Asset</div>
+        <div className={styles.modalHeader}>Register Image as an IP Asset</div>
         <hr />
         <div className={styles.modalContent}>
           {' '}

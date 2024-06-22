@@ -66,7 +66,7 @@ Each of these steps shows loading, success, or error states, with details about 
 
 ## Code Structure
 
-This is a React-based project using TypeScript. The most important libraries used in this project are:
+This is a React-based project using TypeScript. Source code has comprehensive comments. The most important libraries used in this project are:
 
 1. **Redux Toolkit** for global state management.
 2. **Fabric.js** for canvas manipulations.
