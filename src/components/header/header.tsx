@@ -6,6 +6,7 @@ import styles from './header.module.css';
 import { createThirdwebClient } from 'thirdweb';
 import { sepolia, ethereum, polygon, arbitrum } from 'thirdweb/chains';
 import IPAsset from '../ipAsset/ipAsset';
+import { REACT_APP_THIRDWEB_TOKEN } from '../const';
 
 /**
  * Header component for the image app editor.
@@ -23,7 +24,8 @@ import IPAsset from '../ipAsset/ipAsset';
  * @returns A React component that renders the header section of the website.
  */
 export default function Header() {
-  let client = createThirdwebClient({ clientId: 'ccd77719917b46d2ceb86aa408e8f6af' });
+  const thirdwebKey = process.env.REACT_APP_THIRDWEB_TOKEN ?? REACT_APP_THIRDWEB_TOKEN;
+  let client = createThirdwebClient({ clientId: thirdwebKey });
 
   return (
     <div className={styles.header}>

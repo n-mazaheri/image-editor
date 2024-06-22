@@ -16,12 +16,15 @@ import { selectImageHeight, selectImagePreview, selectImageType, selectImageWidt
 import { upload } from 'thirdweb/storage';
 import { useContext } from 'react';
 import { CanvasContext } from '../contexts/canvasContext';
+import { REACT_APP_NFT_ADDRESS, REACT_APP_THIRDWEB_TOKEN } from '../components/const';
 
 const useCreateNft = () => {
+  const nftContractAddress = process.env.REACT_APP_NFT_ADDRESS ?? REACT_APP_NFT_ADDRESS;
+  const thirdwebKey = process.env.REACT_APP_THIRDWEB_TOKEN ?? REACT_APP_THIRDWEB_TOKEN;
   let chain = useActiveWalletChain();
   let account = useActiveAccount();
   let userAddress = account?.address;
-  let client = createThirdwebClient({ clientId: 'ccd77719917b46d2ceb86aa408e8f6af' });
+  let client = createThirdwebClient({ clientId: thirdwebKey! });
   const { canvasRef, createDataUrl } = useContext(CanvasContext);
   const imageType = useSelector(selectImageType);
   const imageHeight = useSelector(selectImageHeight);
@@ -59,7 +62,7 @@ const useCreateNft = () => {
       const myContract = getContract({
         client,
         chain,
-        address: '0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc',
+        address: nftContractAddress!,
         abi: mintContractAbi,
       });
       const transaction = prepareContractCall({
@@ -127,7 +130,7 @@ const useCreateNft = () => {
       let storyClient = await initializeStoryClient();
 
       const registeredIpAssetResponse = await storyClient?.ipAsset.register({
-        nftContract: '0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc' as Address,
+        nftContract: nftContractAddress! as Address,
         tokenId,
         txOptions: { waitForTransaction: true },
         metadata: {
@@ -146,7 +149,7 @@ const useCreateNft = () => {
 
   const initializeStoryClient: () => Promise<StoryClient | undefined> = async () => {
     if (chain && account) {
-      let client = createThirdwebClient({ clientId: 'ccd77719917b46d2ceb86aa408e8f6af' });
+      let client = createThirdwebClient({ clientId: thirdwebKey! });
       const viemClientWallet = viemAdapter.walletClient.toViem({
         client,
         chain,
