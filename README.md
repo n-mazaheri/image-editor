@@ -2,9 +2,9 @@
 
 Welcome to the Image Editor project, a powerful and user-friendly tool for creating and editing images. Built with React.js and the Fabric.js library, this application allows users to upload images or start with a blank canvas to add and manipulate various shapes, texts, and layers. With advanced features such as customizable colors, sizes, and a comprehensive layer system, users can design complex images effortlessly. Additionally, the application supports the registration of images as IP assets using blockchain technology, ensuring the preservation of intellectual property. Whether you are working on a desktop or a mobile device, the Image Editor offers a seamless and responsive experience tailored to your needs.
 
-## Live demo
+## Demo
 
-You can see a live video of the project [here](https://www.loom.com/share/446edca425d443a88a90c8b52b9e1545), created with Loom.
+You can see a video of the project [here](https://www.loom.com/share/446edca425d443a88a90c8b52b9e1545), created with Loom.
 
 You can test a live demo of the project [here](https://n-mazaheri.github.io/), created with GitHub Pages.
 
