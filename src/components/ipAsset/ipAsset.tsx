@@ -9,6 +9,7 @@ enum State {
   LOADING = 'LOADING',
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR',
+  UNKOWN = 'UNKOWN',
 }
 export default function IPAsset() {
   let account = useActiveAccount();
