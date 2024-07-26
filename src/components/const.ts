@@ -1,2 +1,2 @@
-export const REACT_APP_NFT_ADDRESS = '0xe8E8dd120b067ba86cf82B711cC4Ca9F22C89EDc';
-export const REACT_APP_THIRDWEB_TOKEN = 'ccd77719917b46d2ceb86aa408e8f6af';
+export const REACT_APP_NFT_ADDRESS = '';
+export const REACT_APP_THIRDWEB_TOKEN = '';
