@@ -4,7 +4,7 @@ Welcome to the Image Editor project, a powerful and user-friendly tool for creat
 
 ## Demo
 
-You can see a video of the project [here](https://www.loom.com/share/446edca425d443a88a90c8b52b9e1545), created with Loom.
+You can see video of the project [here](https://www.loom.com/share/446edca425d443a88a90c8b52b9e1545), created with Loom.
 
 You can test a live demo of the project [here](https://n-mazaheri.github.io/), created with GitHub Pages.
 
