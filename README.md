@@ -16,11 +16,14 @@ To better manage shapes and objects, the application employs a layer system. Eac
 
 Users can save the resulting image while preserving the quality and file type of the initial image. To enhance usability for those working on smaller screens or with large-width images, the application resizes images to fill 80% of the window width. To maintain image quality, it employs an offscreen canvas that retains the original image size. All objects added by the user are resized and copied from the visible canvas to the offscreen canvas. This offscreen canvas is then used to save the resulting image with its original width, height, type, and quality. During the design process, if the user changes the window size (e.g., adjusts the browser width or rotates a mobile device), the application automatically resizes the visible canvas to 80% of the new window width. Users also have the option to clear the canvas and start with a new blank canvas.
 
+Instead of uploading image from local computer, user can generate an image with the help of Stable Diffusion api and then use this image as initial image for editing in canvas.
+
 Users can register an IP asset based on the image they design. To achieve this, the application uses the ThirdWeb library to connect to wallets, switch networks, upload images to IPFS, and generate a URL. It then uses the Story Protocol SDK to register the NFT with metadata about the image, such as its URL, as an IP asset. With the help of ThirdWeb's connect functionality, users can connect with various wallets, and even web2 users unfamiliar with wallets can connect via social logins. After connecting to their wallet, the application automatically switches the network to the desired network (in this case, the Ethereum test net Sepolia). If a user revisits the webpage, it will automatically reconnect to their wallet. If a user is already connected, they can register their IP asset. This process involves three steps:
 
 1. Uploading the image to IPFS and creating a link.
 2. Minting the NFT and creating the tokenId.
 3. Registering the minted NFT and metadata of the file, such as the URL, in Story Protocol.
+4. Generate initial image with artificial intelligence with the help of Stable Diffusion api
 
 For testing purposes, users need to have a wallet, such as the MetaMask browser wallet.
 
@@ -58,6 +61,10 @@ For managing shapes inside the canvas, the application includes a layer system, 
 <img src="image-3.png" width="150">
 
 Users can change the order of layers by clicking the arrow down and arrow up buttons beside each layer in the layer list, indicating the order of objects in the canvas. Users can send back objects in a layer by clicking the up button or bring them to the front by clicking the down button. The arrangement of objects is based on their layer order: objects in the first layer are the furthest back, followed by objects in subsequent layers, with objects in the last layer being in front of all others.
+
+Users can generate initial image in canvas with the help of artificial intelligence. For this ability, we use Stable Diffusion api. user can click on Generate Image(AI) in the header. It will open a modal like this. User can add a prompt describing image he want to create and then click on Generate Image button. Then, if he like generated image, can use this image in canvas by click on Load image in canvas button.
+
+<img src="image-6.png" width="150">
 
 Users can save the resulting image as an IP asset to preserve the intellectual property of the image. To do this, users need to connect to their wallet by clicking the "Connect" button in the header. This shows a connect dialog that supports connection with over 300 desktop or mobile wallets. Users need to connect to Sepolia, an Ethereum testnet chain. After connecting, the "Connect" button changes to show the connected state, displaying the user's balance and address. Users can then click the "IP Asset" button in the header to make the image an IP asset. This starts the process and displays a dialog showing the process steps:
 
