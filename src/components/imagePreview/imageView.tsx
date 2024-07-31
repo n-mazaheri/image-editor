@@ -66,6 +66,7 @@ export default function ImageView() {
         image.src = imagePreview;
 
         image.onload = function () {
+          console.log('load');
           dispatch(setImageHeight(image.height));
           dispatch(setImageWidth(image.width));
           const containerWidth = window.innerWidth * 0.8; // 80% of window width
@@ -75,6 +76,7 @@ export default function ImageView() {
           canvasRef.current!.setWidth(canvasWidth);
           canvasRef.current!.setHeight(canvasHeight);
           canvasRef.current!.renderAll();
+          console.log(imagePreview);
           canvasRef.current!.setBackgroundImage(imagePreview, canvasRef.current!.renderAll.bind(canvasRef.current), {
             top: 0,
             left: 0,

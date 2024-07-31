@@ -7,6 +7,7 @@ import { createThirdwebClient } from 'thirdweb';
 import { sepolia, ethereum, polygon, arbitrum } from 'thirdweb/chains';
 import IPAsset from '../ipAsset/ipAsset';
 import { REACT_APP_THIRDWEB_TOKEN } from '../const';
+import Dalle from '../dalle/dalle';
 
 /**
  * Header component for the image app editor.
@@ -48,6 +49,7 @@ export default function Header() {
           detailsButton={{ className: styles.connect }}
         ></ConnectButton>
         <IPAsset />
+        <Dalle />
       </div>
     </div>
   );
